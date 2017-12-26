@@ -17,7 +17,7 @@ WORKINGDIR="" # place to put result directories etc.
 # defaults:
 BATCHSIZE=32
 DROPOUT=0.01
-EPOCHS=13
+EPOCHS=20
 GPUID=0
 ARTIFICIAL=0
 COPYATTENTION=""
@@ -104,9 +104,10 @@ python ../OpenNMT-py/train.py -data $modeldir/lemmatizer -save_model $modeldir/l
 # EVAL ON DEVEL
 for epoch in 10 15 20 ; do
     outfile="tb=$TREEBANK|batchsize=$BATCHSIZE|dropout=$DROPOUT|epochs=$epoch|artificial=$ARTIFICIAL|copyattention=$COPY"
-    python ../predict.py -model $modeldir/*e$epoch.pt -src $datadir/dev.udpipe.input -output $datadir/dev.predictions -gpu $GPUID
+    python ../OpenNMT-py/translate.py -model $modeldir/*e$epoch.pt -src $datadir/dev.input -output $datadir/dev.predictions -gpu $GPUID
     cat $datadir/dev.output | perl -pe 's/ //g' | perl -pe 's/\$@@\$/ /g' > $datadir/dev.gold
-    paste $datadir/dev.gold $datadir/dev.predictions > $griddir/$outfile.grid
+    cat $datadir/dev.predictions | perl -pe 's/ //g' | perl -pe 's/\$@@\$/ /g' > $datadir/dev.predictions.clean
+    paste $datadir/dev.gold $datadir/dev.predictions.clean > $griddir/$outfile.grid
 done
 
 
