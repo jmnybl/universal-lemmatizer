@@ -2,27 +2,32 @@
 _	n	_	NOUN	_	
 _	np	_	PROPN	_	
 _	vblex	_	VERB	_	aux?
-_	vbser	_	COP	_	aux?
-_	vbhaver	_	VERB	_	aux?
+_	vbser	_	AUX,VERB	_	verb to be, UD2.0 does not have COP
+_	vbhaver	_	VERB,AUX	_	verb to have, aux?
 _	vaux	_	AUX	_	
 _	adj	_	ADJ	_	
 _	post	_	ADP	AdpType=Post	
 _	adv	_	ADV	_	
 _	preadv	_	ADV	_	
 _	postadv	_	ADV	_	
-_	mod	_	_	_	not in english data?
+_	vbmod	_	AUX	_	
 _	det	_	DET	_	
+_	predet	_	DET	_	
 _	prn	_	PRON	_	
 _	pr	_	ADP	AdpType=Prep	
 _	num	_	NUM	_	
 _	ij	_	INTJ	_	
-_	cncoo	_	CCONJ	_	
+_	cnjcoo	_	CCONJ	_	
 _	cnjsub	_	SCONJ	_	
 _	cnjadv	_	ADV,SCONJ	_	
 _	sent	_	PUNCT	_	
 _	cm	_	PUNCT	_	
 _	lquot	_	PUNCT	_	
 _	rquot	_	PUNCT	_	
+_	lpar	_	PUNCT	_	
+_	rpar	_	PUNCT	_	
+_	guio	_	PUNCT	_	
+_	v	_	VERB	_	
 _	_	f	_	Gender=Fem	
 _	_	m	_	Gender=Masc	
 _	_	nt	_	Gender=Neut	
@@ -86,6 +91,7 @@ _	_	prs	_	Tense=Pres|Mood=Sub
 _	_	pis	_	Tense=Past|Mood=Sub	
 _	_	fts	_	Tense=Fut|Mood=Sub	
 _	_	fti	_	Tense=Fut|Mood=Ind	
+_	_	fut	_	Tense=Fut	
 _	_	pri	_	Tense=Pres|Mood=Ind	
 _	_	pii	_	Tense=Past|Mood=Ind	
 _	_	supn	_	VerbForm=Sup	
@@ -107,3 +113,7 @@ _	_	px3sp	_	Person[psor]=3
 _	_	pst	_	Degree=Pos	
 _	_	comp	_	Degree=Cmp	
 _	_	sup	_	Degree=Sup	
+_	_	inf	_	VerbForm=Inf	
+_	_	ord	_	NumType=Ord	
+_	_	impf	_	Aspect=Imp	
+_	_	perf	_	Aspect=Perf	

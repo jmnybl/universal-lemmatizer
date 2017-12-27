@@ -70,7 +70,7 @@ def apertium_to_conllu(line):
 			tag_pos = pos_dict.get(t, "")
 			tag_feature = feature_dict.get(t, "")
 			if not (tag_pos or tag_feature):
-				print("Tag: '" + t + "' was not recognized.", file=sys.stderr)
+				print("Tag: '" + t + "' was not recognized in ", s, file=sys.stderr)
 			else:
 				if tag_pos:
 					pos_tags.append(tag_pos)
@@ -87,8 +87,8 @@ def apertium_to_conllu(line):
 
 		pos_list = pos_field.split(",")
 
-		print(pos_list)
-		print(separated_feature_fields)
+		print(pos_list,file=sys.stderr)
+		print(separated_feature_fields,file=sys.stderr)
 
 		for pos in pos_list:
 			for feature_field in separated_feature_fields:
@@ -104,13 +104,13 @@ input_format = sys.argv[1] # "apertium" or "giella"
 
 pos_dict, feature_dict = load_dictionaries("apertium2ud.tsv")
 
-print("Dictionaries loaded:")
-print(pos_dict)
-print(feature_dict)
+print("Dictionaries loaded:",file=sys.stderr)
+print(pos_dict,file=sys.stderr)
+print(feature_dict,file=sys.stderr)
 
 for line in sys.stdin:
 	if line and len(line) > 0:
-		print("Line: " + line)
+		print("Line: " + line,file=sys.stderr)
 		if input_format == "apertium":
 			apertium_to_conllu(line)
 		elif input_format == "giella":
