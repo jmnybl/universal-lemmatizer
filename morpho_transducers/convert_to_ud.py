@@ -43,8 +43,45 @@ def separate_feature_analysis(feature_list):
 		return_list = overwriting_list
 	return return_list
 
+
 def giella_to_conllu(line):
-	print("foobar")
+	results = []
+	tab_split = line.split("\t")
+	analyzed_input = tab_split[0]
+	compound_split = tab_split[1].split("#")
+	lemma = ""
+	pos_tags = []
+	feature_tags = []
+	for part in compound_split:
+		lemma_tags = part.split("+")
+		lemma = lemma + lemma_tags.pop(0)
+		for tag in lemma_tags:
+			pos_tag = pos_dict.get(tag, "")
+			if pos_tag:
+				pos_tags.append(pos_tag)
+			feature_tag = feature_dict.get(tag, "")
+			if feature_tag:
+				feature_tags.append(feature_tag)
+	pos_field = "_"
+	if len(pos_tags) > 0:
+		pos_field = pos_tags[0]
+
+	separated_feature_fields = separate_feature_analysis(feature_tags)
+	if len(separated_feature_fields) == 0:
+		separated_feature_fields.append("_")
+
+	pos_list = pos_field.split(",")
+	print(pos_list,file=sys.stderr)
+	print(separated_feature_fields,file=sys.stderr)
+
+	for pos in pos_list:
+		for feature_field in separated_feature_fields:
+			results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
+
+	for r in results:
+		print(r)
+	
+	print("\n")
 
 def apertium_to_conllu(line):
 	results = []
@@ -109,6 +146,7 @@ print(pos_dict,file=sys.stderr)
 print(feature_dict,file=sys.stderr)
 
 for line in sys.stdin:
+	line = line.strip()
 	if line and len(line) > 0:
 		print("Line: " + line,file=sys.stderr)
 		if input_format == "apertium":
