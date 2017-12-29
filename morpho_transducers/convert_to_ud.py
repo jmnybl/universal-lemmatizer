@@ -1,10 +1,13 @@
 import sys
 import re
+import argparse
 
-'''
-feature_dict = {"post":"AdpType=Post", "pr":"AdpType=Prep", "f":"Gender=Fem", "m":"Gender=Masc", "nt":"Gender=Neut", "ut":"Gender=Com", "mf":"Gender=Fem,Gender=Masc", "mn":"Gender=Masc,Gender=Neut", "fn":"Gender=Fem,Gender=Neut", "mfn":"Gender=Masc,Gender=Neut,Gender=Fem", "mp":"Gender=Masc|Animacy=Hum", "ma":"Gender=Masc|Animacy=Anim", "mi":"Gender=Masc|Animacy=Inan", "aa":"Animacy=Anim", "an":"Animacy=Anim,Animacy=Inan", "nn":"Animacy=Inan", "pers":"PronType=Prs", "rel":"PronType=Rel", "acr":"Abbr=Yes", "ind":"PronType=Ind", "ref":"Reflex=Yes", "pos":"Poss=Yes", "dem":"PronType=Dem", "def":"PronType=Art|Definite=Def", "itg":"PronType=Int", "ind":"PronType=Art|Definite=Ind", "sg":"Number=Sing", "pl":"Number=Plur", "sp":"Number=Plur,Number=Sing", "du":"Number=Dual", "nom":"Case=Nom", "acc":"Case=Acc", "dat":"Case=Dat", "gen":"Case=Gen", "dg":"Case=Dat,Case=Gen", "voc":"Case=Voc", "abl":"Case=Abl", "ins":"Case=Ins", "loc":"Case=Loc", "tra":"Case=Tra", "ill":"Case=Ill", "ine":"Case=Ine", "ade":"Case=Ade", "all":"Case=All", "abe":"Case=Abe", "ess":"Case=Ess", "par":"Case=Par", "dis":"Case=Dis", "com":"Case=Com", "actv":"Voice=Act", "pass":"Voice=Pass", "pasv":"Voice=Pass", "midv":"Voice=Mid", "caus":"Voice=Cau", "pres":"Tense=Pres", "pret":"Tense=Past", "past":"Tense=Past", "pmp":"Tense=Pqp", "plu":"Tense=Pqp"}
-pos_dict = {"n":"NOUN", "np":"PROPN", "vblex":"VERB", "vbser":"COP", "vbhaver":"VERB", "vaux":"AUX", "adj":"ADJ", "post":"ADP", "adv":"ADV", "preadv":"ADV", "postadv":"ADV", "mod":"", "det":"DET", "prn":"PRON", "pr":"ADP", "num":"NUM", "ij":"INTJ", "cncoo":"CCONJ", "cnjsub":"SCONJ", "cnjadv":"ADV,SCONJ", "sent":"PUNCT", "cm":"PUNCT", "lquot":"PUNCT", "rquot":"PUNCT"}
-'''
+parser = argparse.ArgumentParser("This script converts POS- and feature-tags from other formats to CoNLL-U")
+parser.add_argument("-v", "--verbose", help="prints debug outputs", action="store_true")
+parser.add_argument("-f", "--format", help="define input format", type=str, choices=["apertium", "giella"], required=True)
+args = parser.parse_args()
+
+
 
 def load_dictionaries(filepath):
 	with open(filepath, "rt") as f:
@@ -50,18 +53,22 @@ def giella_to_conllu(line):
 	analyzed_input = tab_split[0]
 	compound_split = tab_split[1].split("#")
 	lemma = ""
+	for part in compound_split:
+		lemma = lemma + "#" + part.split("+")[0]
+	lemma = lemma.strip("#")
+
 	pos_tags = []
 	feature_tags = []
-	for part in compound_split:
-		lemma_tags = part.split("+")
-		lemma = lemma + lemma_tags.pop(0)
-		for tag in lemma_tags:
-			pos_tag = pos_dict.get(tag, "")
-			if pos_tag:
-				pos_tags.append(pos_tag)
-			feature_tag = feature_dict.get(tag, "")
-			if feature_tag:
-				feature_tags.append(feature_tag)
+	last_tags = compound_split[-1].split("+")
+	last_tags.pop(0)
+	for tag in last_tags:
+		pos_tag = pos_dict.get(tag, "")
+		if pos_tag:
+			pos_tags.append(pos_tag)
+		feature_tag = feature_dict.get(tag, "")
+		if feature_tag:
+			feature_tags.append(feature_tag)
+
 	pos_field = "_"
 	if len(pos_tags) > 0:
 		pos_field = pos_tags[0]
@@ -71,20 +78,49 @@ def giella_to_conllu(line):
 		separated_feature_fields.append("_")
 
 	pos_list = pos_field.split(",")
+	print("POS-tags: ", end="\t", file=sys.stderr)
 	print(pos_list,file=sys.stderr)
+	print("Feature-tags: ", end="\t", file=sys.stderr)
 	print(separated_feature_fields,file=sys.stderr)
 
 	for pos in pos_list:
 		for feature_field in separated_feature_fields:
+			features = feature_field.split("|")
+			features.sort()
+			feature_field = "|".join(features)
 			results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
 
 	for r in results:
 		print(r)
-	
-	print("\n")
 
 def apertium_to_conllu(line):
+	erroneus_input = re.sub("\^.+?\$", "", line) # cases where apertium transducer has preserved unanalyzed characters between compound words from the raw data
+	if erroneus_input:
+		print("Erroneus input, discarding.", file=sys.stderr)
+		print("\n", file=sys.stderr)
+		return ""
+	if "*" in line: #apertium notation for unrecognized words
+		print("'*' input unrecognized, discarding.", file=sys.stderr)
+		print("\n", file=sys.stderr)
+		return ""
 	results = []
+
+	separated_compounds = re.findall("\^(.*?)\$", line)
+
+	if len(separated_compounds) > 1:
+		lemma = ""
+		analyzed_input = ""
+		for part in separated_compounds:
+			split = part.split("/")
+			analyzed_input = analyzed_input + split[0].strip("^")
+			lemma = lemma + "<>+" + split[1][:split[1].index("<")]
+		last_part = separated_compounds.pop()
+		last_tags = last_part[last_part.index("<"):]
+		print("Found '$^'-separated compound word, line: " + line, file=sys.stderr)
+		line = analyzed_input + "/" + lemma.strip("<>+") + last_tags
+		print("Generated artificial input: " + line, file=sys.stderr)
+		
+
 	split = line.split("/")
 	analyzed_input = split.pop(0).strip("^")
 	for s in split:
@@ -123,29 +159,36 @@ def apertium_to_conllu(line):
 			separated_feature_fields.append("_")
 
 		pos_list = pos_field.split(",")
-
+		print("POS-tags: ", end="\t", file=sys.stderr)
 		print(pos_list,file=sys.stderr)
+		print("Feature-tags: ", end="\t", file=sys.stderr)
 		print(separated_feature_fields,file=sys.stderr)
 
 		for pos in pos_list:
 			for feature_field in separated_feature_fields:
+				features = feature_field.split("|")
+				features.sort()
+				feature_field = "|".join(features)
 				results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
 
 	for r in results:
 		print(r)
-	
 	print("\n")
 
+input_format = args.format # "apertium" or "giella"
 
-input_format = sys.argv[1] # "apertium" or "giella"
+if not args.verbose:
+	sys.stderr = open("conversion_errors.txt", "w")
 
 pos_dict, feature_dict = load_dictionaries("apertium2ud.tsv")
 
-print("Dictionaries loaded:",file=sys.stderr)
-print(pos_dict,file=sys.stderr)
-print(feature_dict,file=sys.stderr)
+#print("Dictionaries loaded:",file=sys.stderr)
+#print(pos_dict,file=sys.stderr)
+#print(feature_dict,file=sys.stderr)
 
 for line in sys.stdin:
+	if line == "\n":
+		print(line)
 	line = line.strip()
 	if line and len(line) > 0:
 		print("Line: " + line,file=sys.stderr)
@@ -153,5 +196,3 @@ for line in sys.stdin:
 			apertium_to_conllu(line)
 		elif input_format == "giella":
 			giella_to_conllu(line)
-		else:
-			print("Format missing on unknown. Please use either 'apertium' or 'giella'")
