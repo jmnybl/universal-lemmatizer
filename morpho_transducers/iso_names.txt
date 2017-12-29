@@ -23,7 +23,7 @@ fi_ftb UD_Finnish-FTB fin
 fi UD_Finnish fin
 fr_partut UD_French-ParTUT _
 fr_sequoia UD_French-Sequoia _
-fr UD_French _
+fr UD_French fra
 gl_treegal UD_Galician-TreeGal glg
 gl UD_Galician glg
 de UD_German deu
@@ -35,7 +35,7 @@ hu UD_Hungarian hun
 id UD_Indonesian _
 ga UD_Irish _
 it_partut UD_Italian-ParTUT _
-it UD_Italian _
+it UD_Italian ita
 ja UD_Japanese _
 kk UD_Kazakh kaz
 ko UD_Korean _
