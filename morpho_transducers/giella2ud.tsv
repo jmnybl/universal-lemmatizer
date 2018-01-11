@@ -1,0 +1,123 @@
+#WORD	#UPOS	#MORPHO	#NEWPOS	#NEWMORPHO	#COMMENTS
+_	A	_	ADJ	_	
+_	_	ABBR	_	Abbr=Yes	
+_	+ACR 	Acronym 	- 	_	
+_	_	_	_	_	
+_	+Actio 	Actio 	- 	_	
+_	Adp	_	ADP	_	
+_	Adv	_	ADV	_	
+_	+Ani 	Animate 	Semantic tag 	_	
+_	+Attr 	Attribute 	- 	_	
+_	+AttrCmp 	Attribute compound 	- 	_	
+_	CC	_	CCONJ	_	
+_	+CLB 	Clause boundary 	- 	_	
+_	CS	_	SCONJ	_	
+_	_	Card	- 	NumType=Card	
+_	+Clth 	Cloth 	Semantic tag 	_	
+_	+Coll 	Collective 	- 	_	
+_	_	_	_	_	
+_	_	Comp	_	Degree=Cmp	
+_	_	ConNeg	_	Negative=Yes	
+_	_	ConNegII	_	Negative=Yes	
+_	_	Cond	_	Mood=Cnd	
+_	+Dem 	Demonstrative 	- 	_	
+_	+Der 	Derivation 	- 	_	
+_	+Du 	Dual 	- 	_	
+_	+Du1 	First person dual 	- 	_	
+_	+Du2 	Second person dual 	- 	_	
+_	+Du3 	Third person dual 	- 	_	
+_	_	_	_	_	
+_	+Fem 	Feminine 	Semantic tag 	_	
+_	_	Nom	_	Case=Nom	
+_	_	Gen	_	Case=Gen	
+_	_	Par	_	Case=Par	
+_	_	Tra	_	Case=Tra	
+_	_	Ess	_	Case=Ess	
+_	_	Ine	_	Case=Ine	
+_	_	Ela	_	Case=Ela	
+_	_	Ill	_	Case=Ill	
+_	_	Ade	_	Case=Ade	
+_	_	Abl	_	Case=Abl	
+_	_	All	_	Case=All	
+_	_	Ins	_	Case=Ins	
+_	_	Com	_	Case=Com	
+_	_	Acc	_	Case=Acc	
+_	_	Loc	_	Case=Loc	
+_	_	Dat	_	Case=Dat	
+_	_	Abe	_	Case=Abe	
+_	_	Cau	_	Case=Cau	
+_	_	Voc	_	Case=Voc	
+_	_	Lat	_	Case=Lat	
+_	_	Cau	_	Case=Cau	
+_	_	_	_	_	
+_	_	_	_	_	
+_	_	_	_	_	
+_	_	_	_	_	
+_	_	_	_	_	
+_	+Ger 	Gerund 	- 	_	
+_	+Guess 	Denotes guessed stem 	- 	_	
+_	+Hum 	Human 	Semantic tag 	_	
+_	+Hyph 	Hyphenation mark 	- 	_	
+_	+IV 	Transitive verb 	- 	_	
+_	_	_	_	_	
+_	_	Imprt	_	Mood=Imp	
+_	_	ImprtII	_	Mood=Imprt	
+_	+InDef 	Indefinite declension 	Nouns, in Erzya, Moksha 	_	
+_	+Ind 	Indicative 	- 	_	
+_	+Indef 	Indefinite pronoun 	Pronouns 	_	
+_	+Inf 	Infinitive 	- 	_	
+_	+Interj 	Interjection 	- 	_	
+_	+Interr 	Interrogative 	- 	_	
+_	+LCmpnd+ 	Left compound part 	- 	_	
+_	+LEFT 	Left parenthesis 	PUNCT	_	?
+_	_	_	_	_	
+_	+Mal 	Male 	Semantic tag 	_	
+_	N	_	NOUN	_	
+_	+Neg 	Negation verb 	- 	Negative=Yes	or polarity=neg?
+_	_	_	_	_	
+_	+NomAg 	Nomen Actiones 	- 	_	
+_	Num	_	NUM	_	
+_	_	Ord	ADJ	NumType=Ord	
+_	PUNCT	_	PUNCT	_	
+_	Pcle	_	PART	_	
+_	_	Pers	_	PronType=Pers	
+_	_	Pl	_	Number=Plur	
+_	_	Pl1	_	Number=Plur|Person=1	
+_	_	Pl2	_	Number=Plur|Person=2	
+_	_	Pl3	_	Number=Plur|Person=3	
+_	+Po 	Place 	Semantic tag 	_	Adp post?
+_	_	Pot	_	Mood=Pot	
+_	_	Pr	_	AdpType=Prep	
+_	+PrfPrc 	Perfect participle 	- 	_	
+_	Pron	_	PRON	_	also det?
+_	N	Prop	PROPN	_	
+_	_	Prs	_	Tense=Pres	
+_	+PrsPrc 	Present participle 	- 	_	
+_	_	Prt	_	Tense=Past	
+_	+PxCPlComRecipr 	?? 	- 	_	
+_	_	PxDu1	_	Number[psor]=Dual|Person[psor]=1	
+_	_	PxDu2	_	Number[psor]=Dual|Person[psor]=2	
+_	_	PxDu3	_	Number[psor]=Dual|Person[psor]=3	
+_	_	PxPl1	_	Number[psor]=Plur|Person[psor]=1	
+_	_	PxPl2	_	Number[psor]=Plur|Person[psor]=2	
+_	_	PxPl3	_	Number[psor]=Plur|Person[psor]=3	
+_	_	PxSg1	_	Number[psor]=Sing|Person[psor]=1	
+_	_	PxSg2	_	Number[psor]=Sing|Person[psor]=2	
+_	_	PxSg3	_	Number[psor]=Sing|Person[psor]=3	
+_	+Qst 	Question particle 	- 	_	
+_	+RCmpnd 	Right compound 	- 	_	
+_	+RIGHT 	Right parenthesis 	- 	_	
+_	_	Recipr	_	PronType=Rcp	
+_	_	Refl	_	Reflex=Yes	
+_	_	Rel	_	PronType=Rel	
+_	+SHyph 	Soft Hyphen 	- 	_	
+_	_	Sg	_	Number=Sing	
+_	_	Sg1	_	Number=Sing|Person=1	
+_	_	Sg2	_	Number=Sing|Person=2	
+_	_	Sg3	_	Number=Sing|Person=3	
+_	+Sup 	Supine 	- 	_	
+_	_	Superl	_	Degree=Sup	
+_	+TV 	Transitive verb 	- 	_	
+_	V	_	VERB	_	
+_	_	Vabess	VERB	VerbForm=Ger|Case=Abe	
+_	_	Vgen	VERB	VerbForm=Ger|Case=Gen	
