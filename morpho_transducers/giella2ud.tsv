@@ -71,11 +71,11 @@ _	_	Pl3	_	Number=Plur|Person=3
 _	_	Po	_	AdpType=Post	_
 _	_	Pot	_	Mood=Pot	
 _	_	Pr	_	AdpType=Prep	
-_	+PrfPrc 	Perfect participle 	- 	_	
+_	_	PrfPrc	_	VerbForm=Part|Tense=Past	
 _	Pron	_	PRON	_	also det?
 _	_	Prop	PROPN	_	
 _	_	Prs	_	Tense=Pres	
-_	+PrsPrc 	Present participle 	- 	_	
+_	_	PrsPrc	_	VerbForm=Part|Tense=Pres	
 _	_	Prt	_	Tense=Past	
 _	_	PxDu1	_	Number[psor]=Dual|Person[psor]=1	
 _	_	PxDu2	_	Number[psor]=Dual|Person[psor]=2	
@@ -106,3 +106,5 @@ _	_	Vabess	VERB	VerbForm=Ger|Case=Abe
 _	_	Vgen	VERB	VerbForm=Ger|Case=Gen	
 _	_	Act	_	Voice=Act	
 _	_	Pss	_	Voice=Pass	
+_	_	_	_	_	InfA,InfE,Der*,Foc*,AgPrc,Pe4
+					aux,cop?
