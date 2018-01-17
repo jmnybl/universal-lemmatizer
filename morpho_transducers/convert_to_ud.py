@@ -53,13 +53,16 @@ def separate_feature_analysis(feature_list):
 def giella_to_conllu(line):
     debug_prints=[]
     debug_prints.append(line)
+    if "?" in line: #giella notation for unrecognized words
+        debug_prints.append("'?' input unrecognized, discarding.")
+        return debug_prints
     results = []
     tab_split = line.split("\t")
     analyzed_input = tab_split[0]
     compound_split = tab_split[1].split("#")
     lemma = ""
     for part in compound_split:
-        lemma = lemma + "#" + part.split("+")[0]
+        lemma = lemma.strip("-") + "#" + part.split("+")[0]
     lemma = lemma.strip("#")
 
     pos_tags = []
@@ -77,8 +80,12 @@ def giella_to_conllu(line):
             debug_prints.append("Tag: '" + tag + "' was not recognized in "+ line)
 
     pos_field = "_"
+    debug_prints.append("Pre-prioritizing POS-tags: "+ ",".join(pos_tags))
     if len(pos_tags) > 0:
-        pos_field = pos_tags[0]
+        if "PROPN" in pos_tags: # might cause problems if more POS-tags need to be prioritized over others
+            pos_field = "PROPN"
+        else:
+            pos_field = pos_tags[0]
 
     separated_feature_fields = separate_feature_analysis(feature_tags)
     if len(separated_feature_fields) == 0:
@@ -95,6 +102,7 @@ def giella_to_conllu(line):
             feature_field = "|".join(features)
             results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
 
+    results = set(results)
     for r in results:
         print(r)
 #    print("")
@@ -176,6 +184,7 @@ def apertium_to_conllu(line):
                 feature_field = "|".join(features)
                 results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
 
+    results = set(results)
     for r in results:
         print(r)
 #    print("")
