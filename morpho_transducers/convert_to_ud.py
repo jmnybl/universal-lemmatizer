@@ -55,7 +55,7 @@ def giella_to_conllu(line):
     debug_prints.append(line)
     if "?" in line: #giella notation for unrecognized words
         debug_prints.append("'?' input unrecognized, discarding.")
-        return debug_prints
+        return debug_prints, []
     results = []
     tab_split = line.split("\t")
     analyzed_input = tab_split[0]
@@ -102,11 +102,11 @@ def giella_to_conllu(line):
             feature_field = "|".join(features)
             results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
 
-    results = set(results)
-    for r in results:
-        print(r)
+#    results = set(results)
+#    for r in results:
+#        print(r)
 #    print("")
-    return debug_prints
+    return debug_prints, results
 
 def apertium_to_conllu(line):
     debug_prints=[]
@@ -114,10 +114,10 @@ def apertium_to_conllu(line):
     erroneus_input = re.sub("\^.+?\$", "", line) # cases where apertium transducer has preserved unanalyzed characters between compound words from the raw data
     if erroneus_input:
         debug_prints.append("Erroneus input, discarding.")
-        return debug_prints
+        return debug_prints, []
     if "*" in line: #apertium notation for unrecognized words
         debug_prints.append("'*' input unrecognized, discarding.")
-        return debug_prints
+        return debug_prints, []
     results = []
 
     separated_compounds = re.findall("\^(.*?)\$", line)
@@ -184,11 +184,11 @@ def apertium_to_conllu(line):
                 feature_field = "|".join(features)
                 results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
 
-    results = set(results)
-    for r in results:
-        print(r)
+#    results = set(results)
+#    for r in results:
+#        print(r)
 #    print("")
-    return debug_prints
+    return debug_prints, results
 
 input_format = args.format # "apertium" or "giella"
 
@@ -201,16 +201,31 @@ pos_dict, feature_dict = load_dictionaries(args.feature_mapping,args)
 #print(pos_dict,file=sys.stderr)
 #print(feature_dict,file=sys.stderr)
 
+debug_lines=[]
+result_lines=[]
 for line in sys.stdin:
     line = line.strip()
     if not line:
-        print(line)
+        if args.verbose:
+            print("\n".join("DEBUG:"+d for d in debug_lines), file=sys.stderr)
+#        print("")
+        if result_lines:
+            print("\n".join(r for r in set(result_lines)))
+            print(line)
+        debug_lines=[]
+        result_lines=[]
         continue
 #    print("Line: " + line,file=sys.stderr)
     if input_format == "apertium":
-        debug=apertium_to_conllu(line)
+        debug, results=apertium_to_conllu(line)
+        debug_lines+=debug
+        result_lines+=results
     elif input_format == "giella":
-        debug=giella_to_conllu(line)
-    if args.verbose:
-        print("\n".join("DEBUG:"+d for d in debug), file=sys.stderr)
-#        print("")
+        debug, results=giella_to_conllu(line)
+        debug_lines+=debug
+        result_lines+=results
+if args.verbose:
+    print("\n".join("DEBUG:"+d for d in debug_lines), file=sys.stderr)
+if result_lines:
+    print("\n".join(r for r in set(result_lines)))
+    print("")

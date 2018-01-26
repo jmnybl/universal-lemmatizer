@@ -9,7 +9,7 @@ _	_	Ani	_	Animacy=Anim
 _	CC	_	CCONJ	_	
 _	+CLB 	Clause boundary 	- 	_	
 _	CS	_	SCONJ	_	
-_	_	Card	- 	NumType=Card	
+_	_	Card	_ 	NumType=Card	
 _	_	Comp	_	Degree=Cmp	
 _	_	ConNeg	_	Negative=Yes	
 _	_	ConNegII	_	Negative=Yes	
@@ -68,9 +68,9 @@ _	_	Pl	_	Number=Plur
 _	_	Pl1	_	Number=Plur|Person=1	
 _	_	Pl2	_	Number=Plur|Person=2	
 _	_	Pl3	_	Number=Plur|Person=3	
-_	_	Po	_	AdpType=Post	_
+_	_	Po	ADP	AdpType=Post	_
 _	_	Pot	_	Mood=Pot	
-_	_	Pr	_	AdpType=Prep	
+_	_	Pr	ADP	AdpType=Prep	
 _	_	PrfPrc	_	VerbForm=Part|Tense=Past	
 _	Pron	_	PRON	_	also det?
 _	_	Prop	PROPN	_	
