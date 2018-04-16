@@ -201,31 +201,37 @@ pos_dict, feature_dict = load_dictionaries(args.feature_mapping,args)
 #print(pos_dict,file=sys.stderr)
 #print(feature_dict,file=sys.stderr)
 
-debug_lines=[]
-result_lines=[]
+#debug_lines=[]
+#result_lines=[]
 for line in sys.stdin:
     line = line.strip()
     if not line:
-        if args.verbose:
-            print("\n".join("DEBUG:"+d for d in debug_lines), file=sys.stderr)
-#        print("")
-        if result_lines:
-            print("\n".join(r for r in set(result_lines)))
-            print(line)
-        debug_lines=[]
-        result_lines=[]
         continue
+#        if args.verbose:
+#            print("\n".join("DEBUG:"+d for d in debug_lines), file=sys.stderr)
+#        print("")
+#        if result_lines:
+#            print("\n".join(r for r in set(result_lines)))
+#            print(line)
+#        debug_lines=[]
+#        result_lines=[]
+#        continue
 #    print("Line: " + line,file=sys.stderr)
     if input_format == "apertium":
         debug, results=apertium_to_conllu(line)
-        debug_lines+=debug
-        result_lines+=results
+#       debug_lines+=debug
+#        result_lines+=results
     elif input_format == "giella":
         debug, results=giella_to_conllu(line)
-        debug_lines+=debug
-        result_lines+=results
-if args.verbose:
-    print("\n".join("DEBUG:"+d for d in debug_lines), file=sys.stderr)
-if result_lines:
-    print("\n".join(r for r in set(result_lines)))
-    print("")
+#        debug_lines+=debug
+#        result_lines+=results
+    if args.verbose:
+        print("\n".join("DEBUG:"+d for d in debug), file=sys.stderr)
+    if results:
+        print("\n".join(r for r in set(results)))
+        print()
+#if args.verbose:
+#    print("\n".join("DEBUG:"+d for d in debug_lines), file=sys.stderr)
+#if result_lines:
+#    print("\n".join(r for r in set(result_lines)))
+#    print("")
