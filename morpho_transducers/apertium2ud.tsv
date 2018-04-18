@@ -32,15 +32,10 @@ _	_	f	_	Gender=Fem
 _	_	m	_	Gender=Masc	
 _	_	nt	_	Gender=Neut	
 _	_	ut	_	Gender=Com	
-_	_	mf	_	Gender=Fem,Gender=Masc	
-_	_	mn	_	Gender=Masc,Gender=Neut	
-_	_	fn	_	Gender=Fem,Gender=Neut	
-_	_	mfn	_	Gender=Masc,Gender=Neut,Gender=Fem	
 _	_	mp	_	Gender=Masc|Animacy=Hum	?
 _	_	ma	_	Gender=Masc|Animacy=Anim	
 _	_	mi	_	Gender=Masc|Animacy=Inan	
 _	_	aa	_	Animacy=Anim	
-_	_	an	_	Animacy=Anim,Animacy=Inan	
 _	_	nn	_	Animacy=Inan	
 _	_	pers	_	PronType=Prs	
 _	_	rel	_	PronType=Rel	
@@ -54,13 +49,11 @@ _	_	itg	_	PronType=Int
 _	_	ind	_	PronType=Art|Definite=Ind	
 _	_	sg	_	Number=Sing	
 _	_	pl	_	Number=Plur	
-_	_	sp	_	Number=Plur,Number=Sing	
 _	_	du	_	Number=Dual	
 _	_	nom	_	Case=Nom	
 _	_	acc	_	Case=Acc	
 _	_	dat	_	Case=Dat	
 _	_	gen	_	Case=Gen	
-_	_	dg	_	Case=Dat,Case=Gen	
 _	_	voc	_	Case=Voc	
 _	_	abl	_	Case=Abl	
 _	_	ins	_	Case=Ins	
