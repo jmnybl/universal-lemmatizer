@@ -18,11 +18,11 @@ nl UD_Dutch nld
 en_lines UD_English-LinES eng
 en_partut UD_English-ParTUT eng
 en UD_English eng
-et UD_Estonian est
+et UD_Estonian _
 fi_ftb UD_Finnish-FTB fin
 fi UD_Finnish fin
-fr_partut UD_French-ParTUT _
-fr_sequoia UD_French-Sequoia _
+fr_partut UD_French-ParTUT fra
+fr_sequoia UD_French-Sequoia fra
 fr UD_French fra
 gl_treegal UD_Galician-TreeGal glg
 gl UD_Galician glg
@@ -31,10 +31,10 @@ got UD_Gothic _
 el UD_Greek ell
 he UD_Hebrew _
 hi UD_Hindi hin
-hu UD_Hungarian hun
+hu UD_Hungarian _
 id UD_Indonesian _
 ga UD_Irish _
-it_partut UD_Italian-ParTUT _
+it_partut UD_Italian-ParTUT ita
 it UD_Italian ita
 ja UD_Japanese _
 kk UD_Kazakh kaz
@@ -42,7 +42,7 @@ ko UD_Korean _
 la_ittb UD_Latin-ITTB _
 la_proiel UD_Latin-PROIEL _
 la UD_Latin _
-lv UD_Latvian lav(lvs)
+lv UD_Latvian lvs
 lt UD_Lithuanian _
 no_bokmaal UD_Norwegian-Bokmaal nob
 no_nynorsk UD_Norwegian-Nynorsk nno
@@ -51,7 +51,7 @@ fa UD_Persian _
 pl UD_Polish pol
 pt_br UD_Portuguese-BR _
 pt UD_Portuguese _
-ro UD_Romanian ron
+ro UD_Romanian _
 ru_syntagrus UD_Russian-SynTagRus rus
 ru UD_Russian rus
 sa UD_Sanskrit _
@@ -60,8 +60,8 @@ sl_sst UD_Slovenian-SST _
 sl UD_Slovenian _
 es_ancora UD_Spanish-AnCora spa
 es UD_Spanish spa
-sv_lines UD_Swedish-LinES _
-sv UD_Swedish _
+sv_lines UD_Swedish-LinES swe
+sv UD_Swedish swe
 ta UD_Tamil _
 tr UD_Turkish tur
 uk UD_Ukrainian ukr
