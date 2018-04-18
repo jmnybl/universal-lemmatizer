@@ -8,7 +8,16 @@ parser.add_argument("-f", "--format", help="define input format", type=str, choi
 parser.add_argument("--feature_mapping", help="Feature mapping table from apertium or giella to UD", type=str, required=True)
 args = parser.parse_args()
 
-
+# sorts the features into alphabetical order as required by the UD format
+def sort_features(feature_field_value):
+    features = feature_field_value.split("|")
+    features = sorted(f.lower() for f in features)
+    for i in range(len(features)):
+        feature_spl = features[i].split("=")
+        for j in range(len(feature_spl)):
+            feature_spl[j] = feature_spl[j].title()
+        features[i] = "=".join(feature_spl)
+    return "|".join(features)
 
 def load_dictionaries(filepath,args):
     with open(filepath, "rt") as f:
@@ -98,8 +107,9 @@ def giella_to_conllu(line):
     for pos in pos_list:
         for feature_field in separated_feature_fields:
             features = feature_field.split("|")
-            features.sort()
+            features.sort() # might be useless with the addition of sort_features()
             feature_field = "|".join(features)
+            feature_field = sort_features(feature_field)
             results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
 
 #    results = set(results)
@@ -180,8 +190,9 @@ def apertium_to_conllu(line):
         for pos in pos_list:
             for feature_field in separated_feature_fields:
                 features = feature_field.split("|")
-                features.sort()
+                features.sort() # might be useless with the addition of sort_features()
                 feature_field = "|".join(features)
+                feature_field = sort_features(feature_field)
                 results.append(analyzed_input + "\t" + lemma + "\t" + pos + "\t" + feature_field)
 
 #    results = set(results)
