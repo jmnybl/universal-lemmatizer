@@ -10,14 +10,14 @@ args = parser.parse_args()
 
 # sorts the features into alphabetical order as required by the UD format
 def sort_features(feature_field_value):
+    if feature_field_value == "_":
+        return feature_field_value
     features = feature_field_value.split("|")
     features = sorted(f.lower() for f in features)
     for i in range(len(features)):
-        feature_spl = features[i].split("=")
-        for j in range(len(feature_spl)):
-            feature_spl[j] = feature_spl[j].title()
-        features[i] = "=".join(feature_spl)
-    return "|".join(features)
+        features[i] = case_correction[features[i]]
+    result = "|".join(features)
+    return result
 
 def load_dictionaries(filepath,args):
     with open(filepath, "rt") as f:
@@ -207,6 +207,12 @@ input_format = args.format # "apertium" or "giella"
 #    sys.stderr = open("conversion_errors.txt", "w")
 
 pos_dict, feature_dict = load_dictionaries(args.feature_mapping,args)
+case_correction = {}
+
+for correct_form in feature_dict.values():
+    separated_feature_names = correct_form.split("|")
+    for name in separated_feature_names:
+        case_correction[name.lower()] = name
 
 #print("Dictionaries loaded:",file=sys.stderr)
 #print(pos_dict,file=sys.stderr)
