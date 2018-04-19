@@ -31,14 +31,14 @@ def read_treebank(args):
                 words[token[FORM]].append((token[LEMMA],token[UPOS],token[FEAT]))
     return words
 
-def transducer_reader(args):
+def transducer_reader(transducer_file):
     """ Yield one wordform with all readings at once from the transducer file. """
     readings=[]
-    if args.transducer.endswith(".gz"):
+    if transducer_file.endswith(".gz"):
         import gzip
-        f=gzip.open(args.transducer,"rt",encoding="utf-8")
+        f=gzip.open(transducer_file,"rt",encoding="utf-8")
     else:
-        f=open(args.transducer,"rt",encoding="utf-8")
+        f=open(transducer_file,"rt",encoding="utf-8")
     for line in f:
         line=line.strip()
         if not line:
@@ -49,21 +49,21 @@ def transducer_reader(args):
         if line.split("\t") not in readings:
             readings.append(line.split("\t"))
 
-def read_transducer(args):
+def read_transducer(transducer_file, max_words=0):
     """ Return the transducer output as dictionary where key: wordform, value: list of readings """
     transducer_words={} # key: word, value: list of (lemma, upos, tags) tuples
-    for readings in transducer_reader(args):
+    for readings in transducer_reader(transducer_file):
         word=readings[0][0]
         if word in transducer_words: # transducer output is not unique words, so skip if it's already stored
             continue
         all_readings=[]
         for item in readings:
-            if item[1].startswith("*") and item[1].endswith("$"): # unrecognized
+            if item[1].startswith("*") and item[1].endswith("$"): # unrecognized # TODO: should this be here or in the convertion script?
                 continue
             all_readings.append(tuple(item[1:]))# remove word from the list as it is the key
         if all_readings:
             transducer_words[word]=all_readings
-        if args.max_words!=0 and len(transducer_words)>args.max_words:
+        if max_words!=0 and len(transducer_words)>max_words:
             break
     return transducer_words
 
@@ -194,7 +194,7 @@ def evaluate(args):
 
     treebank_words=read_treebank(args) # key: word, value: list of (lemma, upos, tags) tuples
 
-    transducer_words=read_transducer(args)
+    transducer_words=read_transducer(args.transducer, args.max_words)
     total, unrecognized, mathing, recall=lemma_recall(args.treebank, transducer_words)
     print("Total words:", total)
     print("Words not recognized by the transducer:", unrecognized, "({x}%)".format(x=unrecognized/total*100))
