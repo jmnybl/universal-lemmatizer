@@ -21,6 +21,31 @@ def read_conllu(f):
         if sent:
             yield comment, sent
 
+def transform_token(cols, extra_tag=""):
+    lemma=" ".join(c if c!=" " else "$@@$" for c in cols[LEMMA]) # replace whitespace with $@@$
+    wordform=" ".join(c if c!=" " else "$@@$" for c in cols[FORM])
+    
+    tags=[]
+    if extra_tag!="":
+        tags.append(extra_tag)
+    tags.append("UPOS="+cols[UPOS])
+    for t in cols[FEAT].split("|"):
+        if t=="_":
+            tags.append("FEAT="+t)
+        else:
+            tags.append(t)
+    tags=" ".join(tags)
+
+    return " ".join([wordform,tags]), lemma
+
+
+def detransform_token(cols, token):
+
+    token="".join(t if t!="$@@$" else " " for t in token.split(" ")) # return original whitespaces
+    cols[LEMMA]=token
+
+    return cols, token
+
 
 def create_data(args):
 
@@ -39,23 +64,12 @@ def create_data(args):
             
             if "-" in token[ID]:
                 continue
+
+            input_,output_=transform_token(cols)
             
-            lemma=" ".join(c for c in token[LEMMA].replace(" ","$@@$")) # replace whitespace with $@@$
-            wordform=" ".join(c for c in token[FORM].replace(" ","$@@$"))
             
-            tags=[]
-            if args.extra_tag!="":
-                tags.append(args.extra_tag)
-            tags.append("UPOS="+token[UPOS])
-            
-            for t in token[FEAT].split("|"):
-                if t=="_":
-                    tags.append("FEAT="+t)
-                else:
-                    tags.append(t)
-            tags=" ".join(tags)
-            print(wordform,tags,file=f_inp)
-            print(lemma,file=f_out)
+            print(input_,file=f_inp)
+            print(output_,file=f_out)
             counter+=1
     print("Done, files have",counter,"examples.",file=sys.stderr)
 
