@@ -1,70 +1,70 @@
-grc_proiel UD_Ancient_Greek-PROIEL _
-grc UD_Ancient_Greek _
-ar_nyuad UD_Arabic-NYUAD ara
-ar UD_Arabic ara
-eu UD_Basque eus
-be UD_Belarusian _
-bg UD_Bulgarian bul
-ca UD_Catalan cat
-zh UD_Chinese _
-cop UD_Coptic _
-hr UD_Croatian _
-cs_cac UD_Czech-CAC ces
-cs_cltt UD_Czech-CLTT ces
-cs UD_Czech ces
-da UD_Danish dan
-nl_lassysmall UD_Dutch-LassySmall nld
-nl UD_Dutch nld
-en_lines UD_English-LinES eng
-en_partut UD_English-ParTUT eng
-en UD_English eng
-et UD_Estonian _
-fi_ftb UD_Finnish-FTB fin
-fi UD_Finnish fin
-fr_partut UD_French-ParTUT fra
-fr_sequoia UD_French-Sequoia fra
-fr UD_French fra
-gl_treegal UD_Galician-TreeGal glg
-gl UD_Galician glg
-de UD_German deu
-got UD_Gothic _
-el UD_Greek ell
-he UD_Hebrew _
-hi UD_Hindi hin
-hu UD_Hungarian _
-id UD_Indonesian _
-ga UD_Irish _
-it_partut UD_Italian-ParTUT ita
-it UD_Italian ita
-ja UD_Japanese _
-kk UD_Kazakh kaz
-ko UD_Korean _
-la_ittb UD_Latin-ITTB _
-la_proiel UD_Latin-PROIEL _
-la UD_Latin _
-lv UD_Latvian lvs
-lt UD_Lithuanian _
-no_bokmaal UD_Norwegian-Bokmaal nob
-no_nynorsk UD_Norwegian-Nynorsk nno
-cu UD_Old_Church_Slavonic _
-fa UD_Persian _
-pl UD_Polish pol
-pt_br UD_Portuguese-BR _
-pt UD_Portuguese _
-ro UD_Romanian _
-ru_syntagrus UD_Russian-SynTagRus rus
-ru UD_Russian rus
-sa UD_Sanskrit _
-sk UD_Slovak _
-sl_sst UD_Slovenian-SST _
-sl UD_Slovenian _
-es_ancora UD_Spanish-AnCora spa
-es UD_Spanish spa
-sv_lines UD_Swedish-LinES swe
-sv UD_Swedish swe
-ta UD_Tamil _
-tr UD_Turkish tur
-uk UD_Ukrainian ukr
-ur UD_Urdu urd
-ug UD_Uyghur _
-vi UD_Vietnamese _
+grc_proiel UD_Ancient_Greek-PROIEL _ _
+grc UD_Ancient_Greek _ _
+ar_nyuad UD_Arabic-NYUAD ara _
+ar UD_Arabic ara _
+eu UD_Basque eus _
+be UD_Belarusian _ _
+bg UD_Bulgarian bul _
+ca UD_Catalan cat _
+zh UD_Chinese _ skip
+cop UD_Coptic _ _
+hr UD_Croatian _ _
+cs_cac UD_Czech-CAC ces _
+cs_cltt UD_Czech-CLTT ces _
+cs UD_Czech ces _
+da UD_Danish dan _
+nl_lassysmall UD_Dutch-LassySmall nld _
+nl UD_Dutch nld _
+en_lines UD_English-LinES eng skip
+en_partut UD_English-ParTUT eng _
+en UD_English eng _
+et UD_Estonian _ _
+fi_ftb UD_Finnish-FTB fin _
+fi UD_Finnish fin _
+fr_partut UD_French-ParTUT fra _
+fr_sequoia UD_French-Sequoia fra _
+fr UD_French fra _
+gl_treegal UD_Galician-TreeGal glg _
+gl UD_Galician glg _
+de UD_German deu _
+got UD_Gothic _ _
+el UD_Greek ell _
+he UD_Hebrew _ _
+hi UD_Hindi hin _
+hu UD_Hungarian _ _
+id UD_Indonesian _ skip
+ga UD_Irish _ _
+it_partut UD_Italian-ParTUT ita _
+it UD_Italian ita _
+ja UD_Japanese _ _
+kk UD_Kazakh kaz _
+ko UD_Korean _ skip
+la_ittb UD_Latin-ITTB _ _
+la_proiel UD_Latin-PROIEL _ _
+la UD_Latin _ _
+lv UD_Latvian lvs _
+lt UD_Lithuanian _ _
+no_bokmaal UD_Norwegian-Bokmaal nob _
+no_nynorsk UD_Norwegian-Nynorsk nno _
+cu UD_Old_Church_Slavonic _ _
+fa UD_Persian _ _
+pl UD_Polish pol _
+pt_br UD_Portuguese-BR _ skip
+pt UD_Portuguese _ _
+ro UD_Romanian _ _
+ru_syntagrus UD_Russian-SynTagRus rus _
+ru UD_Russian rus _
+sa UD_Sanskrit _ _
+sk UD_Slovak _ _
+sl_sst UD_Slovenian-SST _ _
+sl UD_Slovenian _ _
+es_ancora UD_Spanish-AnCora spa _
+es UD_Spanish spa _
+sv_lines UD_Swedish-LinES swe skip
+sv UD_Swedish swe _
+ta UD_Tamil _ _
+tr UD_Turkish tur _
+uk UD_Ukrainian ukr _
+ur UD_Urdu urd _
+ug UD_Uyghur _ skip
+vi UD_Vietnamese _ skip

@@ -27,6 +27,7 @@ _	rquot	_	PUNCT	_
 _	lpar	_	PUNCT	_	
 _	rpar	_	PUNCT	_	
 _	guio	_	PUNCT	_	
+_	punct	_	PUNCT	_	
 _	v	_	VERB	_	
 _	_	f	_	Gender=Fem	
 _	_	m	_	Gender=Masc	

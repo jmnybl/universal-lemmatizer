@@ -77,6 +77,8 @@ def lemma_recall(gold_file, transducer_readings, lowercase=False):
     with open(gold_file, "rt", encoding="utf-8") as f:
         for comm, sent in conllu_reader(f):
             for token in sent:
+                if "-" in token[ID]: # skip multiword tokens
+                    continue
                 word=token[FORM]
                 total_words+=1
                 if word not in transducer_readings:
@@ -90,7 +92,7 @@ def lemma_recall(gold_file, transducer_readings, lowercase=False):
                     transducer_lemmas=set([l for l,p,t in transducer_readings[word]])
                 if treebank_lemma in transducer_lemmas:
                     matching_lemmas+=1
-    return total_words, unrecognized_words, matching_lemmas, matching_lemmas/total_words if (matching_lemmas!=0 and total_words!=0) else 0 # return total_words, unrecognized, mathing, recall
+    return total_words, unrecognized_words, matching_lemmas, matching_lemmas/total_words*100 if (matching_lemmas!=0 and total_words!=0) else 0 # return total_words, unrecognized, mathing, recall
 
 
 def validate_features(features):
@@ -109,6 +111,8 @@ def oracle_full_match(gold_file, transducer_readings, lowercase=False):
     with open(gold_file, "rt", encoding="utf-8") as f:
         for comm, sent in conllu_reader(f):
             for token in sent:
+                if "-" in token[ID]: # skip multiword tokens
+                    continue
                 word=token[FORM]
                 total_words+=1
                 if word not in transducer_readings:
@@ -137,6 +141,8 @@ def oracle_full_match_without_lemma(gold_file, transducer_readings, lowercase=Fa
     with open(gold_file, "rt", encoding="utf-8") as f:
         for comm, sent in conllu_reader(f):
             for token in sent:
+                if "-" in token[ID]: # skip multiword tokens
+                    continue
                 word=token[FORM]
                 total_words+=1
                 if word not in transducer_readings:
@@ -164,6 +170,8 @@ def tag_recall(gold_file, transducer_readings, lowercase=False):
     with open(gold_file, "rt", encoding="utf-8") as f:
         for comm, sent in conllu_reader(f):
             for token in sent:
+                if "-" in token[ID]: # skip multiword tokens
+                    continue
                 word=token[FORM]
                 treebank_lemma=token[LEMMA]
                 total_words+=1
