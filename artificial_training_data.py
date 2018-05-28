@@ -13,12 +13,16 @@ def create_data(args):
             if not line:
                 continue
             try:
-                count,char=line.split()
+                count,char=line.split(" ",1)
                 characters.append(char)
                 counts.append(int(count))
             except:
                 print("Error with line",line,file=sys.stderr)
                 continue
+        if " " not in characters: # add whitespace if it's not there
+            print("Adding whitespace into vocabulary", file=sys.stderr)
+            characters.append(" ")
+            counts.append(100)
         counts=[c/sum(counts) for c in counts]
         print(counts[:10])
 
@@ -34,15 +38,15 @@ def create_data(args):
 
         # create random strings based on character distribution
         # --> but guarantee that each character is sampled at least once
-        # --> because we want to keep complete vocabulary
+        #     because we want to keep complete vocabulary
         if selector==len(characters):
             selector=0
         chars=[characters[selector]]
         
-        chars+=list(np.random.choice(characters,np.random.randint(2,12),replace=True,p=counts)) # can take probabilities
+        chars+=list(np.random.choice(characters,np.random.randint(2,12),replace=True,p=counts)) # takes character probabilities
         shuffle(chars)    
-        lemma=" ".join(c for c in "".join(chars).replace(" ","$@@$")) # replace whitespace with $@@$
-        wordform=" ".join(c for c in "".join(chars).replace(" ","$@@$"))
+        lemma=" ".join(c if c!=" " else "$@@$" for c in chars) # replace whitespace with $@@$
+        wordform=" ".join(c if c!=" " else "$@@$" for c in chars)
             
         tags=[]
         if args.extra_tag!="":
