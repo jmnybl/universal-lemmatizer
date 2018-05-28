@@ -8,7 +8,7 @@ import select
 
 from prepare_data import read_conllu, transform_token, detransform_token, ID
 
-sys.path.insert(0,os.getcwd()+"/OpenNMT-py") # could be replaced with symlinks
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "OpenNMT-py"))
 
 from onmt.translate.Translator import make_translator
 
@@ -18,7 +18,6 @@ import onmt
 import onmt.ModelConstructor
 import onmt.modules
 import onmt.opts
-import sys
 
 
 def nonblocking_batches(f=sys.stdin,timeout=0.2,batch_lines=1000):
@@ -53,70 +52,99 @@ def nonblocking_batches(f=sys.stdin,timeout=0.2,batch_lines=1000):
             line_buffer=[]
 
 
+class Lemmatizer(object):
+
+    def __init__(self, args=None):
+        # init lemmatizer model
+        parser = argparse.ArgumentParser(
+        description='translate.py',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        onmt.opts.add_md_help_argument(parser)
+        onmt.opts.translate_opts(parser)
+
+        if not args: # take arguments from sys.argv (this must be called from the main)
+            self.opt = parser.parse_args()
+        else:
+            self.opt = parser.parse_args(args)
+
+        # make virtual files to collect the transformed input and output
+        self.f_input=io.StringIO() 
+        self.f_output=io.StringIO()
+
+        self.translator = make_translator(self.opt, report_score=True, out_file=self.f_output) # always output to virtual file
 
 
-def main(opt):
 
-    f_input=io.StringIO() # make virtual files to collect the transformed input and output
-    f_output=io.StringIO()
+    def lemmatize_batch(self, data_batch):
 
-
-    translator = make_translator(opt, report_score=True, out_file=f_output) # always output to virtual file
-
-
-    if opt.src!="":
-        corpus_file = open(opt.src, "rt", encoding="utf-8")
-    else: 
-        corpus_file = sys.stdin
-
-    if opt.output!="":
-        real_output_file=open(opt.output, "wt", encoding="utf-8")
-    else:
-        real_output_file=sys.stdout
-
-    for batch in nonblocking_batches(f=corpus_file):
+        # lemmatize data_batch
         original_sentences=[]
-        for (comm, sent) in read_conllu(batch.split("\n")):
+        for (comm, sent) in read_conllu(data_batch.split("\n")):
             original_sentences.append((comm, sent))
             for token in sent:
                 if "-" in token[ID]: # multiword token line, not supposed to be analysed
                     continue
                 form, _ = transform_token(token)
-                print(form, file=f_input, flush=True)
+                print(form, file=self.f_input, flush=True)
 
         # run lemmatizer
-        f_input.seek(0) # beginning of the virtual file
-        translator.translate(opt.src_dir, f_input, opt.tgt,
-                         opt.batch_size, opt.attn_debug)
+        self.f_input.seek(0) # beginning of the virtual file
+        self.translator.translate(self.opt.src_dir, self.f_input, self.opt.tgt,
+                         self.opt.batch_size, self.opt.attn_debug) # TODO how to deal with missing opt
 
         # collect lemmas from virtual output file, transform and inject to conllu
-        f_output.seek(0)
+        self.f_output.seek(0)
+        output_lines=[]
         for comm, sent in original_sentences:
             for c in comm:
-                print(c, file=real_output_file)
+                output_lines.append(c)
             for cols in sent:
                 if "-" in cols[ID]: # multiword token line, not supposed to be analysed
-                    print("\t".join(t for t in cols), file=real_output_file, flush=True)
-                predicted_lemma=f_output.readline().strip()
+                    output_lines.append("\t".join(t for t in cols))
+                    continue
+                predicted_lemma=self.f_output.readline().strip()
                 cols, token = detransform_token(cols, predicted_lemma)
-                print("\t".join(t for t in cols), file=real_output_file, flush=True)
-            print(file=real_output_file, flush=True)
+                output_lines.append("\t".join(t for t in cols))
+            output_lines.append("")
 
-        f_input=io.StringIO() # clear virtual files
-        f_output=io.StringIO()
-        translator.out_file=f_output
+        self.f_input=io.StringIO() # clear virtual files
+        self.f_output=io.StringIO()
+        self.translator.out_file=self.f_output
 
-    if opt.src!="":
+        return "\n".join(output_lines)
+
+def main():
+
+    # init and load models
+    lemmatizer=Lemmatizer()
+
+    # input file
+    if lemmatizer.opt.src!="":
+        corpus_file = open(lemmatizer.opt.src, "rt", encoding="utf-8")
+    else: 
+        corpus_file = sys.stdin
+
+    # output file
+    if lemmatizer.opt.output!="":
+        real_output_file=open(lemmatizer.opt.output, "wt", encoding="utf-8")
+    else:
+        real_output_file=sys.stdout
+
+    # lemmatize
+    for batch in nonblocking_batches(f=corpus_file):
+
+        lemmatized_batch=lemmatizer.lemmatize_batch(batch)
+        print(lemmatized_batch, file=real_output_file, flush=True)
+
+
+    # close files if needed
+    if lemmatizer.opt.src!="":
         corpus_file.close()
-    if opt.output!="":
+    if lemmatizer.opt.output!="":
         real_output_file.close()
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description='translate.py',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    onmt.opts.add_md_help_argument(parser)
-    onmt.opts.translate_opts(parser)
 
-    opt = parser.parse_args()
-    main(opt)
+
+if __name__ == "__main__":
+
+    main()
