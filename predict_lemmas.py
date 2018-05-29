@@ -111,7 +111,7 @@ class Lemmatizer(object):
         self.f_output=io.StringIO()
         self.translator.out_file=self.f_output
 
-        return "\n".join(output_lines)
+        return "\n".join(output_lines)+"\n"
 
 def main():
 
