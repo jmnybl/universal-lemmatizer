@@ -134,7 +134,7 @@ def main():
     for batch in nonblocking_batches(f=corpus_file):
 
         lemmatized_batch=lemmatizer.lemmatize_batch(batch)
-        print(lemmatized_batch, file=real_output_file, flush=True)
+        print(lemmatized_batch, file=real_output_file, flush=True, end="")
 
 
     # close files if needed
