@@ -3,9 +3,9 @@ import os
 import numpy as np
 from random import shuffle
 
-def create_data(args):
+def character_probabilities(vocab):
 
-    with open(args.vocabulary,"rt",encoding="utf-8") as f:
+    with open(vocab,"rt",encoding="utf-8") as f:
         characters=[]
         counts=[]
         for line in f:
@@ -24,17 +24,24 @@ def create_data(args):
             characters.append(" ")
             counts.append(100)
         counts=[c/sum(counts) for c in counts]
-        print(counts[:10])
+        print(counts[:10], file=sys.stderr)
 
-    if not os.path.exists(os.path.dirname(args.output)):
-        os.makedirs(os.path.dirname(args.output))
+    return characters, counts
 
-    f_inp=open(args.output+".input","wt",encoding="utf-8")
-    f_out=open(args.output+".output","wt",encoding="utf-8")
+def create_data(vocabulary, example_count, extra_tag):
+
+    characters, counts = character_probabilities(vocabulary)
+
+    #if not os.path.exists(os.path.dirname(args.output)):
+    #    os.makedirs(os.path.dirname(args.output))
+
+    #f_inp=open(args.output+".input","wt",encoding="utf-8")
+    #f_out=open(args.output+".output","wt",encoding="utf-8")
 
     counter=0
     selector=0
-    while counter<args.count:
+    data=[]
+    while counter<example_count:
 
         # create random strings based on character distribution
         # --> but guarantee that each character is sampled at least once
@@ -50,16 +57,34 @@ def create_data(args):
             
         tags=[]
         if args.extra_tag!="":
-            tags.append(args.extra_tag)
-           
-        tags=" ".join(tags)
-        print(wordform,tags,file=f_inp)
-        print(lemma,file=f_out)
+            tags.append(extra_tag)
+        if tags:
+            tags=" ".join(tags)
+            wordform=" ".join([wordform, tags])
+        data.append((wordform, lemma))
         counter+=1
         selector+=1
-    print("Done, files have",counter,"examples.",file=sys.stderr)
+    print("Done, produced",counter,"examples.",file=sys.stderr)
+    return data
 
 
+def main(args):
+
+    data=create_data(args.vocabulary, args.count, args.extra_tag)
+
+    # print to files
+    if not os.path.exists(os.path.dirname(args.output)):
+        os.makedirs(os.path.dirname(args.output))
+
+    f_inp=open(args.output+".input","wt",encoding="utf-8")
+    f_out=open(args.output+".output","wt",encoding="utf-8")
+
+    for (word, lemma) in data:
+        print(word,file=f_inp)
+        print(lemma,file=f_out)
+
+    f_inp.close()
+    f_out.close()
 
 if __name__=="__main__":
 
@@ -75,4 +100,4 @@ if __name__=="__main__":
     
     args = parser.parse_args()
 
-    create_data(args)
+    main(args)

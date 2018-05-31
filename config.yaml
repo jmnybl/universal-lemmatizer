@@ -1,0 +1,15 @@
+fi_tdt:
+  train: /usr/share/ParseBank/ud-2.2-st-train-dev-data/ud-treebanks-v2.2/UD_Finnish-TDT/fi_tdt-ud-train.conllu
+  dev: /usr/share/ParseBank/ud-2.2-st-train-dev-data/ud-treebanks-v2.2/UD_Finnish-TDT/fi_tdt-ud-dev.conllu
+  test: None
+  model_dir: lemmatizer_models_v2.2/fi_tdt
+  basic: True
+  artificial: False
+  artificial_size: 10000
+  artificial_vocab: /home/jmnybl/git_checkout/universal-lemmatizer/universal_character_vocabulary
+  artificial_tag: t=ART
+  transducer: False
+  transducer_data: None
+  transducer_size: 10000
+  transducer_tag: t=TRANS
+  train_parameters: "-gpuid 0 -dropout 0.1"
