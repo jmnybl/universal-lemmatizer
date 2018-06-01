@@ -1,15 +1,48 @@
-fi_tdt:
-  train: /usr/share/ParseBank/ud-2.2-st-train-dev-data/ud-treebanks-v2.2/UD_Finnish-TDT/fi_tdt-ud-train.conllu
-  dev: /usr/share/ParseBank/ud-2.2-st-train-dev-data/ud-treebanks-v2.2/UD_Finnish-TDT/fi_tdt-ud-dev.conllu
+example_config:
+  train: train.conllu
+  dev: dev.conllu
   test: None
-  model_dir: lemmatizer_models_v2.2/fi_tdt
+  model_dir: lemmatizer_models/example_config
   basic: True
   artificial: False
   artificial_size: 10000
-  artificial_vocab: /home/jmnybl/git_checkout/universal-lemmatizer/universal_character_vocabulary
+  artificial_vocab: char_vocab.txt # if empty will create from train
   artificial_tag: t=ART
   transducer: False
   transducer_data: None
   transducer_size: 10000
   transducer_tag: t=TRANS
+  preprocess_parameters: "-src_words_min_frequency 5 -tgt_words_min_frequency 5" # preprocess section from OpenNMT-py/onmt/opts.py
+  train_parameters: "-gpuid 0 -dropout 0.1" # OpenNMT-py/onmt/opts.py
+
+fi_tdt:
+  train: /usr/share/ParseBank/ud-2.2-st-train-dev-data/ud-treebanks-v2.2/UD_Finnish-TDT/fi_tdt-ud-train.conllu
+  dev: /usr/share/ParseBank/ud-2.2-st-train-dev-data/ud-treebanks-v2.2/UD_Finnish-TDT/fi_tdt-ud-dev.conllu
+  test: None
+  model_dir: lemmatizer_models_v2.2/fi_tdt_art
+  basic: True
+  artificial: False
+  artificial_size: 5000
+  artificial_tag: t=ART
+  transducer: False
+  transducer_data: None
+  transducer_size: 10000
+  transducer_tag: t=TRANS
+  preprocess_parameters: "-src_words_min_frequency 5 -tgt_words_min_frequency 5"
+  train_parameters: "-gpuid 0 -dropout 0.1"
+
+fi_tdt_art:
+  train: /usr/share/ParseBank/ud-2.2-st-train-dev-data/ud-treebanks-v2.2/UD_Finnish-TDT/fi_tdt-ud-train.conllu
+  dev: /usr/share/ParseBank/ud-2.2-st-train-dev-data/ud-treebanks-v2.2/UD_Finnish-TDT/fi_tdt-ud-dev.conllu
+  test: None
+  model_dir: lemmatizer_models_v2.2/fi_tdt_art
+  basic: False
+  artificial: True
+  artificial_size: 5000
+  artificial_tag: t=ART
+  transducer: False
+  transducer_data: None
+  transducer_size: 10000
+  transducer_tag: t=TRANS
+  preprocess_parameters: "-src_words_min_frequency 10 -tgt_words_min_frequency 10"
   train_parameters: "-gpuid 0 -dropout 0.1"
