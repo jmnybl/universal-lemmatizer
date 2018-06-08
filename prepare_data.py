@@ -1,7 +1,7 @@
 import sys
 import os
 
-ID,FORM,LEMMA,UPOS,POS,FEAT,HEAD,DEPREL,DEPS,MISC=range(10)
+ID,FORM,LEMMA,UPOS,XPOS,FEAT,HEAD,DEPREL,DEPS,MISC=range(10)
 
 def read_conllu(f):
     sent=[]
@@ -29,6 +29,7 @@ def transform_token(cols, extra_tag=""):
     if extra_tag!="":
         tags.append(extra_tag)
     tags.append("UPOS="+cols[UPOS])
+    tags.append("XPOS="+cols[XPOS])
     for t in cols[FEAT].split("|"):
         if t=="_":
             tags.append("FEAT="+t)

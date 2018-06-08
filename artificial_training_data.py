@@ -2,7 +2,7 @@ import sys
 import os
 import numpy as np
 from random import shuffle
-from prepare_data import read_conllu,ID,FORM,LEMMA,UPOS,POS,FEAT,HEAD,DEPREL,DEPS,MISC
+from prepare_data import read_conllu,ID,FORM,LEMMA,UPOS,XPOS,FEAT,HEAD,DEPREL,DEPS,MISC
 
 def read_character_probabilities(vocab):
 
