@@ -70,7 +70,7 @@ def load_dict(args):
     d={}
     with open(args.load_dict, "rt") as f:
         for line in f:
-            form, upos, xpos, feats, lemma = line.strip.split("\t")
+            form, upos, xpos, feats, lemma = line.strip().split("\t")
             d[(form, upos, xpos, feats)]=lemma
     return d
 
