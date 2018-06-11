@@ -2,6 +2,8 @@ import sys
 import os
 
 ID,FORM,LEMMA,UPOS,XPOS,FEAT,HEAD,DEPREL,DEPS,MISC=range(10)
+POS=XPOS
+
 
 def read_conllu(f):
     sent=[]
@@ -39,6 +41,8 @@ def transform_token(cols, extra_tag=""):
 
     return " ".join([wordform,tags]), lemma
 
+def detransform_string(token):
+    return "".join(t if t!="$@@$" else " " for t in token.split(" "))
 
 def detransform_token(cols, token):
 

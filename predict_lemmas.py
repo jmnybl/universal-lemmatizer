@@ -6,7 +6,7 @@ import sys
 import os
 import select
 
-from prepare_data import read_conllu, transform_token, detransform_token, ID
+from prepare_data import read_conllu, transform_token, detransform_token, detransform_string, ID, FORM, LEMMA, UPOS, XPOS, FEAT
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "OpenNMT-py"))
 
@@ -72,21 +72,37 @@ class Lemmatizer(object):
         self.f_output=io.StringIO()
 
         self.translator = make_translator(self.opt, report_score=True, out_file=self.f_output) # always output to virtual file
-
-
-
+        self.cache={} #tokendata -> lemma  #comes pre-computed with the model
+        try:
+            if self.opt.lemma_cache:
+                with gzip.open(self.opt.lemma_cache,"rt") as f:
+                    self.cache=json.load(f)
+        except AttributeError:
+            pass
+        self.localcache={} #tokendata -> lemma  #remembered by this process, lost thereafter
+        
     def lemmatize_batch(self, data_batch):
+
+        submitted=set() #set of submitted tokens
+        submitted_tdata=[] #list of token data entries submitted for lemmatization
 
         # lemmatize data_batch
         original_sentences=[]
+        token_counter=0
         for (comm, sent) in read_conllu(data_batch.split("\n")):
             original_sentences.append((comm, sent))
             for token in sent:
                 if "-" in token[ID]: # multiword token line, not supposed to be analysed
                     continue
-                form, _ = transform_token(token)
-                print(form, file=self.f_input, flush=True)
-
+                token_counter+=1
+                token_data=(token[FORM],token[UPOS],token[XPOS],token[FEAT])
+                if token_data not in self.cache and token_data not in submitted and token_data not in self.localcache:
+                    submitted.add(token_data)
+                    submitted_tdata.append(token_data)
+                    form, _ = transform_token(token)
+                    print(form, file=self.f_input)
+        self.f_input.flush()
+        print(" >>> {}/{} submitted to lemmatizer, rest in cache".format(len(submitted_tdata),token_counter),file=sys.stderr)
         # run lemmatizer
         self.f_input.seek(0) # beginning of the virtual file
         self.translator.translate(self.opt.src_dir, self.f_input, self.opt.tgt,
@@ -94,6 +110,11 @@ class Lemmatizer(object):
 
         # collect lemmas from virtual output file, transform and inject to conllu
         self.f_output.seek(0)
+        lemmatized_batch={} #token-data -> lemma
+        lemm_output=list(self.f_output.readlines())
+        for tdata,predicted_lemma in zip(submitted_tdata,lemm_output):
+            predicted_lemma=detransform_string(predicted_lemma.strip())
+            self.localcache[tdata]=predicted_lemma
         output_lines=[]
         for comm, sent in original_sentences:
             for c in comm:
@@ -102,8 +123,14 @@ class Lemmatizer(object):
                 if "-" in cols[ID]: # multiword token line, not supposed to be analysed
                     output_lines.append("\t".join(t for t in cols))
                     continue
-                predicted_lemma=self.f_output.readline().strip()
-                cols, token = detransform_token(cols, predicted_lemma)
+                token_data=(cols[FORM],cols[UPOS],cols[XPOS],cols[FEAT])
+                if token_data in self.cache:
+                    plemma=self.cache[token_data]
+                elif token_data in self.localcache:
+                    plemma=self.localcache[token_data]
+                else:
+                    assert False, ("Missing lemma", token_data)
+                cols[LEMMA]=plemma
                 output_lines.append("\t".join(t for t in cols))
             output_lines.append("")
 
