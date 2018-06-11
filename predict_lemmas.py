@@ -61,27 +61,39 @@ class Lemmatizer(object):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         onmt.opts.add_md_help_argument(parser)
         onmt.opts.translate_opts(parser)
+        parser.add_argument('-lemma_cache', type=str, default="", help='File to read lemma cache')
 
         if not args: # take arguments from sys.argv (this must be called from the main)
             self.opt = parser.parse_args()
         else:
             self.opt = parser.parse_args(args)
 
+
         # make virtual files to collect the transformed input and output
         self.f_input=io.StringIO() 
         self.f_output=io.StringIO()
 
         self.translator = make_translator(self.opt, report_score=True, out_file=self.f_output) # always output to virtual file
+
+        # init lemma cache
         self.cache={} #tokendata -> lemma  #comes pre-computed with the model
-        try:
-            if self.opt.lemma_cache:
-                with gzip.open(self.opt.lemma_cache,"rt") as f:
-                    self.cache=json.load(f)
-        except AttributeError:
-            pass
+        if self.opt.lemma_cache:
+            self.read_cache(self.opt.lemma_cache)
         self.localcache={} #tokendata -> lemma  #remembered by this process, lost thereafter
-        
+      
+
+    def read_cache(self, cache_file):
+        """ make lemmatizer faster by keeping lemma cache (run lemmatizer only for words not in this cache) """
+        self.cache={}
+        with open(cache_file, "rt") as f:
+            for line in f:
+                form, upos, xpos, feats, lemma = line.strip().split("\t")
+                self.cache[(form, upos, xpos, feats)]=lemma
+
+
+  
     def lemmatize_batch(self, data_batch):
+        """ Lemmatize one data batch """
 
         submitted=set() #set of submitted tokens
         submitted_tdata=[] #list of token data entries submitted for lemmatization
