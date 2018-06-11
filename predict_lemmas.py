@@ -20,7 +20,7 @@ import onmt.modules
 import onmt.opts
 
 
-def nonblocking_batches(f=sys.stdin,timeout=0.2,batch_lines=1000):
+def nonblocking_batches(f=sys.stdin,timeout=0.2,batch_lines=5000):
     """Yields batches of the input conllu (as string), always ending with an empty line.
     Batch is formed when at least batch_lines are read, or when no input is seen in timeour seconds
     Stops yielding when f is closed"""
@@ -106,7 +106,7 @@ class Lemmatizer(object):
         # run lemmatizer
         self.f_input.seek(0) # beginning of the virtual file
         self.translator.translate(self.opt.src_dir, self.f_input, self.opt.tgt,
-                         self.opt.batch_size, self.opt.attn_debug) # TODO how to deal with missing opt
+                         self.opt.batch_size, self.opt.attn_debug)
 
         # collect lemmas from virtual output file, transform and inject to conllu
         self.f_output.seek(0)
@@ -138,7 +138,7 @@ class Lemmatizer(object):
         self.f_output=io.StringIO()
         self.translator.out_file=self.f_output
 
-        return "\n".join(output_lines)
+        return "\n".join(output_lines)+"\n"
 
 def main():
 
@@ -161,7 +161,7 @@ def main():
     for batch in nonblocking_batches(f=corpus_file):
 
         lemmatized_batch=lemmatizer.lemmatize_batch(batch)
-        print(lemmatized_batch, file=real_output_file, flush=True)
+        print(lemmatized_batch, file=real_output_file, flush=True, end="")
 
 
     # close files if needed

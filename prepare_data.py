@@ -4,6 +4,7 @@ import os
 ID,FORM,LEMMA,UPOS,XPOS,FEAT,HEAD,DEPREL,DEPS,MISC=range(10)
 POS=XPOS
 
+
 def read_conllu(f):
     sent=[]
     comment=[]
@@ -30,6 +31,7 @@ def transform_token(cols, extra_tag=""):
     if extra_tag!="":
         tags.append(extra_tag)
     tags.append("UPOS="+cols[UPOS])
+    tags.append("XPOS="+cols[XPOS])
     for t in cols[FEAT].split("|"):
         if t=="_":
             tags.append("FEAT="+t)
@@ -50,16 +52,12 @@ def detransform_token(cols, token):
     return cols, token
 
 
-def create_data(args):
+def create_data(input_file):
 
-    if not os.path.exists(os.path.dirname(args.output)):
-        os.makedirs(os.path.dirname(args.output))
-
-    f_inp=open(args.output+".input","wt",encoding="utf-8")
-    f_out=open(args.output+".output","wt",encoding="utf-8")
+    data=[]
 
     counter=0
-    for comm, sent in read_conllu(open(args.file,"rt",encoding="utf-8")):
+    for comm, sent in read_conllu(open(input_file,"rt",encoding="utf-8")):
         
         for token in sent:
         
@@ -68,14 +66,27 @@ def create_data(args):
             if "-" in token[ID]:
                 continue
 
-            input_,output_=transform_token(cols)
-            
-            
-            print(input_,file=f_inp)
-            print(output_,file=f_out)
+            input_,output_=transform_token(token)
+            data.append((input_, output_))
             counter+=1
-    print("Done, files have",counter,"examples.",file=sys.stderr)
 
+    print("Done, produced",counter,"examples.",file=sys.stderr)
+    return data
+
+def main(args):
+
+    data=create_data(args.file)
+
+    if not os.path.exists(os.path.dirname(args.output)):
+        os.makedirs(os.path.dirname(args.output))
+
+    f_inp=open(args.output+".input","wt",encoding="utf-8")
+    f_out=open(args.output+".output","wt",encoding="utf-8")
+
+    for (input_, output_) in data:
+
+        print(input_,file=f_inp)
+        print(output_,file=f_out)
 
 
 if __name__=="__main__":
@@ -91,4 +102,4 @@ if __name__=="__main__":
     
     args = parser.parse_args()
 
-    create_data(args)
+    main(args)
