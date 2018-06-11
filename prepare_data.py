@@ -48,7 +48,7 @@ def detransform_token(cols, token):
     return cols, token
 
 
-def create_data(input_file):
+def create_data(input_file, extra_tag=""):
 
     data=[]
 
@@ -62,7 +62,7 @@ def create_data(input_file):
             if "-" in token[ID]:
                 continue
 
-            input_,output_=transform_token(token)
+            input_,output_=transform_token(token, extra_tag=extra_tag)
             data.append((input_, output_))
             counter+=1
 
@@ -71,7 +71,7 @@ def create_data(input_file):
 
 def main(args):
 
-    data=create_data(args.file)
+    data=create_data(args.file, extra_tag=args.axtra_tag)
 
     if not os.path.exists(os.path.dirname(args.output)):
         os.makedirs(os.path.dirname(args.output))
