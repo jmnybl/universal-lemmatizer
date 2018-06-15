@@ -142,6 +142,8 @@ class Lemmatizer(object):
                     plemma=self.localcache[token_data]
                 else:
                     assert False, ("Missing lemma", token_data)
+                if plemma.strip()=="":
+                    plemma="_" # make sure not to output empty lemma
                 cols[LEMMA]=plemma
                 output_lines.append("\t".join(t for t in cols))
             output_lines.append("")
