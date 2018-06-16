@@ -4,6 +4,7 @@ import os
 from random import shuffle
 from artificial_training_data import create_data as create_art_data
 from prepare_data import create_data as create_treebank_data
+import glob
 
 
 
@@ -13,13 +14,13 @@ def create_training_data(config):
     print("Creating training data...", file=sys.stderr)
     data=[]
     # use artificial data?
-    if config["basic"]!=True and config["artificial"]==True:
+    if config["basic"]!=True and "artificial" in config and config["artificial"]==True:
         if "artificial_vocab" not in config: # create vocab from training data if it's not given
             config["artificial_vocab"]=config["train"]
         data+=create_art_data(config["artificial_vocab"], config["artificial_size"], config["artificial_tag"])
 
     # use transducer data?
-    if config["basic"]!=True and config["transducer"]==True:
+    if config["basic"]!=True and "transducer" in config and config["transducer"]==True:
         pass
     # treebank data
     data+=create_treebank_data(config["train"])
@@ -27,6 +28,12 @@ def create_training_data(config):
     model_dir=config["model_dir"]
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
+    else:
+        # clear directory
+        files = glob.glob(os.path.join(model_dir,"*"))
+        for f in files:
+            print("Deleting file", f,file=sys.stderr)
+            os.remove(f)
     #else:
         
     with open(os.path.join(model_dir,"train.input"), "wt") as input_file, open(os.path.join(model_dir,"train.output"), "wt") as output_file:
