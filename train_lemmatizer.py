@@ -3,6 +3,7 @@ import sys
 import os
 from random import shuffle
 from artificial_training_data import create_data as create_art_data
+from transducer_training_data import create_data as create_trans_data
 from prepare_data import create_data as create_treebank_data
 import glob
 
@@ -21,7 +22,7 @@ def create_training_data(config):
 
     # use transducer data?
     if config["basic"]!=True and "transducer" in config and config["transducer"]==True:
-        pass
+        data+=create_trans_data(config["transducer_data"], config["transducer_word_freq"], config["train"], config["transducer_size"], config["transducer_tag"]) # transducer, word_freq, treebank_data, max_words, extra_tag
     # treebank data
     data+=create_treebank_data(config["train"])
     shuffle(data)
