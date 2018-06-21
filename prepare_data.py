@@ -50,7 +50,7 @@ def detransform_string(token):
             continue
         if len(t)>1 and "=" in t: # leaked pos or morphological tag because of -replace_unk
             continue 
-        chars.append(c)
+        chars.append(t)
     return "".join(chars)
 
 def detransform_token(cols, token):
