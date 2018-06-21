@@ -119,7 +119,6 @@ class Lemmatizer(object):
                         form, _ = transform_token(token,xpos=False)
                     else:
                         form, _ = transform_token(token)
-                    print(form,file=sys.stderr)
                     print(form, file=self.f_input)
         self.f_input.flush()
         print(" >>> {}/{} submitted to lemmatizer, rest in cache".format(len(submitted_tdata),token_counter),file=sys.stderr)
@@ -143,7 +142,10 @@ class Lemmatizer(object):
                 if "-" in cols[ID]: # multiword token line, not supposed to be analysed
                     output_lines.append("\t".join(t for t in cols))
                     continue
-                token_data=(cols[FORM],cols[UPOS],cols[XPOS],cols[FEAT])
+                if self.opt.no_xpos:
+                    token_data=(cols[FORM],cols[UPOS],cols[XPOS],cols[FEAT])
+                else:
+                    token_data=(cols[FORM],cols[UPOS],cols[FEAT])
                 if token_data in self.cache:
                     plemma=self.cache[token_data]
                 elif token_data in self.localcache:
