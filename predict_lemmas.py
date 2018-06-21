@@ -108,7 +108,7 @@ class Lemmatizer(object):
                 if "-" in token[ID]: # multiword token line, not supposed to be analysed
                     continue
                 token_counter+=1
-                if self.opt.no_xpos==True:
+                if self.opt.no_xpos:
                     token_data=(token[FORM],token[UPOS],token[FEAT])
                 else:
                     token_data=(token[FORM],token[UPOS],token[XPOS],token[FEAT])
@@ -143,9 +143,9 @@ class Lemmatizer(object):
                     output_lines.append("\t".join(t for t in cols))
                     continue
                 if self.opt.no_xpos:
-                    token_data=(cols[FORM],cols[UPOS],cols[XPOS],cols[FEAT])
-                else:
                     token_data=(cols[FORM],cols[UPOS],cols[FEAT])
+                else:
+                    token_data=(cols[FORM],cols[UPOS],cols[XPOS],cols[FEAT])
                 if token_data in self.cache:
                     plemma=self.cache[token_data]
                 elif token_data in self.localcache:
