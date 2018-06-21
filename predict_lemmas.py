@@ -62,6 +62,7 @@ class Lemmatizer(object):
         onmt.opts.add_md_help_argument(parser)
         onmt.opts.translate_opts(parser)
         parser.add_argument('-lemma_cache', type=str, default="", help='File to read lemma cache')
+        parser.add_argument('-no_xpos', default=False, action='store_true', help='Do not use xpos tag in lemmatization.')
 
         if not args: # take arguments from sys.argv (this must be called from the main)
             self.opt = parser.parse_args()
@@ -107,11 +108,18 @@ class Lemmatizer(object):
                 if "-" in token[ID]: # multiword token line, not supposed to be analysed
                     continue
                 token_counter+=1
-                token_data=(token[FORM],token[UPOS],token[XPOS],token[FEAT])
+                if self.opt.no_xpos==True:
+                    token_data=(token[FORM],token[UPOS],token[FEAT])
+                else:
+                    token_data=(token[FORM],token[UPOS],token[XPOS],token[FEAT])
                 if token_data not in self.cache and token_data not in submitted and token_data not in self.localcache:
                     submitted.add(token_data)
                     submitted_tdata.append(token_data)
-                    form, _ = transform_token(token)
+                    if self.opt.no_xpos:
+                        form, _ = transform_token(token,xpos=False)
+                    else:
+                        form, _ = transform_token(token)
+                    print(form,file=sys.stderr)
                     print(form, file=self.f_input)
         self.f_input.flush()
         print(" >>> {}/{} submitted to lemmatizer, rest in cache".format(len(submitted_tdata),token_counter),file=sys.stderr)

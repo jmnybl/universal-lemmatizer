@@ -23,7 +23,7 @@ def read_conllu(f):
         if sent:
             yield comment, sent
 
-def transform_token(cols, extra_tag=""):
+def transform_token(cols, extra_tag="", xpos=True):
     lemma=" ".join(c if c!=" " else "$@@$" for c in cols[LEMMA]) # replace whitespace with $@@$
     wordform=" ".join(c if c!=" " else "$@@$" for c in cols[FORM])
     
@@ -31,7 +31,8 @@ def transform_token(cols, extra_tag=""):
     if extra_tag!="":
         tags.append(extra_tag)
     tags.append("UPOS="+cols[UPOS])
-    tags.append("XPOS="+cols[XPOS])
+    if xpos:
+        tags.append("XPOS="+cols[XPOS])
     for t in cols[FEAT].split("|"):
         if t=="_":
             tags.append("FEAT="+t)
