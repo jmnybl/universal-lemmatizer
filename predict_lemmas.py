@@ -122,18 +122,19 @@ class Lemmatizer(object):
                     print(form, file=self.f_input)
         self.f_input.flush()
         print(" >>> {}/{} submitted to lemmatizer, rest in cache".format(len(submitted_tdata),token_counter),file=sys.stderr)
-        # run lemmatizer
-        self.f_input.seek(0) # beginning of the virtual file
-        self.translator.translate(self.opt.src_dir, self.f_input, self.opt.tgt,
+        # run lemmatizer if everything is not in cache
+        if len(submitted_tdata)>0:
+            self.f_input.seek(0) # beginning of the virtual file
+            self.translator.translate(self.opt.src_dir, self.f_input, self.opt.tgt,
                          self.opt.batch_size, self.opt.attn_debug)
 
-        # collect lemmas from virtual output file, transform and inject to conllu
-        self.f_output.seek(0)
-        lemmatized_batch={} #token-data -> lemma
-        lemm_output=list(self.f_output.readlines())
-        for tdata,predicted_lemma in zip(submitted_tdata,lemm_output):
-            predicted_lemma=detransform_string(predicted_lemma.strip())
-            self.localcache[tdata]=predicted_lemma
+            # collect lemmas from virtual output file, transform and inject to conllu
+            self.f_output.seek(0)
+            lemmatized_batch={} #token-data -> lemma
+            lemm_output=list(self.f_output.readlines())
+            for tdata,predicted_lemma in zip(submitted_tdata,lemm_output):
+                predicted_lemma=detransform_string(predicted_lemma.strip())
+                self.localcache[tdata]=predicted_lemma
         output_lines=[]
         for comm, sent in original_sentences:
             for c in comm:
