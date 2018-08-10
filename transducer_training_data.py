@@ -44,7 +44,11 @@ def read_transducer(transducer_file):
                 block=[]
                 continue
         else:
-            form,lemma,upos,feat=line.split("\t")
+            try:
+                form,lemma,upos,feat=line.split("\t")
+            except:
+                print("Something weird:",line, file=sys.stderr)
+                continue
             if upos=="_":
                 #print("skipping bad reading:",upos,feat,lemma)
                 continue
@@ -67,26 +71,25 @@ def collect_readings(transducer, word_freq, treebank_data, max_words):
     all_readings=read_transducer(transducer)
     word_frequencies=read_word_frequencies(word_freq)
     print(word_frequencies[:100],file=sys.stderr)
-    if treebank_data!="":
-        treebank_words=read_treebank_words(treebank_data)
-    else:
-        treebank_words=set()
+    treebank_words=read_treebank_words(treebank_data)
 
     # now sample 4K most frequent words from the transducer readings which does not already appear in the treebank training data
     data=[]
+    counter=0
     for word, count in word_frequencies:
-        if count<10:
-            break
         if word in treebank_words:
             continue
         if word not in all_readings:
             continue
         readings=all_readings[word]
         keys=[k for k,val in readings.items()]
-        shuffle(keys)
-        upos,feat=keys[0]
-        data.append((word,upos,feat,readings[(upos,feat)]))
-        if len(data)>=max_words:
+        examples=[]
+        for key in keys: # use all possible readings (words with ambigious lemma readings are already dropped)
+            upos,feat=key
+            example=(word,upos,feat,readings[(upos,feat)])
+            data.append(example)
+        counter+=1
+        if counter>=max_words:
             break
 
     return data
@@ -100,13 +103,17 @@ def create_data(transducer, word_freq, treebank_data, max_words, extra_tag):
 
         lemma=" ".join(c if c!=" " else "$@@$" for c in lemma) # replace whitespace with $@@$
         wordform=" ".join(c if c!=" " else "$@@$" for c in form)
-            
+        
+        # note: cannot add XPOS
         tags=[]
         if extra_tag!="":
             tags.append(extra_tag)
         tags.append("UPOS="+upos)
         for feat in feats.split("|"):
-            tags.append(feat)
+            if feat=="_":
+                tags.append("FEAT="+feat)
+            else:
+                tags.append(feat)
         tags=" ".join(tags)
         wordform=" ".join([wordform, tags])
         data.append((wordform, lemma))
@@ -129,7 +136,7 @@ if __name__=="__main__":
     
     args = parser.parse_args()
 
-    data=create_data(args.transducer, args.word_freq, args.training_data, args.max_words, args.extra_tag)
+    data=create_data(args.transducer, args.word_freq, args.training_data, args.max_words, args.extra_tag, args.min_freq, args.weighted)
     for form , lemma in data:
         print(form, lemma, sep="\t")
 
