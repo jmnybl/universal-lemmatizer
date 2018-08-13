@@ -106,7 +106,10 @@ def create_data(transducer, word_freq, treebank_data, max_words, extra_tag):
             tags.append(extra_tag)
         tags.append("UPOS="+upos)
         for feat in feats.split("|"):
-            tags.append(feat)
+            if feat=="_":
+                tags.append("FEAT="+feat)
+            else:
+                tags.append(feat)
         tags=" ".join(tags)
         wordform=" ".join([wordform, tags])
         data.append((wordform, lemma))
