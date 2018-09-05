@@ -20,6 +20,7 @@ import onmt.modules
 import onmt.opts
 
 
+
 def nonblocking_batches(f=sys.stdin,timeout=0.2,batch_lines=5000):
     """Yields batches of the input conllu (as string), always ending with an empty line.
     Batch is formed when at least batch_lines are read, or when no input is seen in timeour seconds
@@ -61,8 +62,6 @@ class Lemmatizer(object):
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         onmt.opts.add_md_help_argument(parser)
         onmt.opts.translate_opts(parser)
-        parser.add_argument('-lemma_cache', type=str, default="", help='File to read lemma cache')
-        parser.add_argument('-no_xpos', default=False, action='store_true', help='Do not use xpos tag in lemmatization.')
 
         if not args: # take arguments from sys.argv (this must be called from the main)
             self.opt = parser.parse_args()
@@ -76,23 +75,9 @@ class Lemmatizer(object):
 
         self.translator = make_translator(self.opt, report_score=True, out_file=self.f_output) # always output to virtual file
 
-        # init lemma cache
-        self.cache={} #tokendata -> lemma  #comes pre-computed with the model
-        if self.opt.lemma_cache:
-            self.read_cache(self.opt.lemma_cache)
-        self.localcache={} #tokendata -> lemma  #remembered by this process, lost thereafter
-      
-
-    def read_cache(self, cache_file):
-        """ make lemmatizer faster by keeping lemma cache (run lemmatizer only for words not in this cache) """
-        self.cache={}
-        with open(cache_file, "rt") as f:
-            for line in f:
-                form, upos, xpos, feats, lemma = line.strip().split("\t")
-                self.cache[(form, upos, xpos, feats)]=lemma
+        self.localcache={} #tokendata -> lemma  #remembered by this process, lost thereafter, option to dump it?
 
 
-  
     def lemmatize_batch(self, data_batch):
         """ Lemmatize one data batch """
 
@@ -108,20 +93,16 @@ class Lemmatizer(object):
                 if "-" in token[ID]: # multiword token line, not supposed to be analysed
                     continue
                 token_counter+=1
-                if self.opt.no_xpos:
-                    token_data=(token[FORM],token[UPOS],token[FEAT])
-                else:
-                    token_data=(token[FORM],token[UPOS],token[XPOS],token[FEAT])
-                if token_data not in self.cache and token_data not in submitted and token_data not in self.localcache:
+                if token[LEMMA]!="_": # already filled in for example by another module, do not process
+                    continue
+                token_data=(token[FORM],token[UPOS],token[XPOS],token[FEAT])
+                if token_data not in self.localcache and token_data not in submitted:
                     submitted.add(token_data)
                     submitted_tdata.append(token_data)
-                    if self.opt.no_xpos:
-                        form, _ = transform_token(token,xpos=False)
-                    else:
-                        form, _ = transform_token(token)
+                    form, _ = transform_token(token)
                     print(form, file=self.f_input)
         self.f_input.flush()
-        print(" >>> {}/{} submitted to lemmatizer, rest in cache".format(len(submitted_tdata),token_counter),file=sys.stderr)
+        print(" >>> {}/{} unique tokens submitted to lemmatizer".format(len(submitted_tdata),token_counter),file=sys.stderr)
         # run lemmatizer if everything is not in cache
         if len(submitted_tdata)>0:
             self.f_input.seek(0) # beginning of the virtual file
@@ -140,16 +121,11 @@ class Lemmatizer(object):
             for c in comm:
                 output_lines.append(c)
             for cols in sent:
-                if "-" in cols[ID]: # multiword token line, not supposed to be analysed
+                if "-" in cols[ID] or cols[LEMMA]!="_": # multiword token line or lemma already predicted, not supposed to be analysed
                     output_lines.append("\t".join(t for t in cols))
                     continue
-                if self.opt.no_xpos:
-                    token_data=(cols[FORM],cols[UPOS],cols[FEAT])
-                else:
-                    token_data=(cols[FORM],cols[UPOS],cols[XPOS],cols[FEAT])
-                if token_data in self.cache:
-                    plemma=self.cache[token_data]
-                elif token_data in self.localcache:
+                token_data=(cols[FORM],cols[UPOS],cols[XPOS],cols[FEAT])
+                if token_data in self.localcache:
                     plemma=self.localcache[token_data]
                 else:
                     assert False, ("Missing lemma", token_data)
