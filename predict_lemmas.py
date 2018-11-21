@@ -1,21 +1,27 @@
 #!/usr/bin/env python
-from __future__ import division, unicode_literals
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
 import argparse
+
 import io
 import sys
 import os
 import select
 
+
 from prepare_data import read_conllu, transform_token, detransform_token, detransform_string, ID, FORM, LEMMA, UPOS, XPOS, FEAT
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "OpenNMT-py"))
 
-from onmt.translate.Translator import make_translator
 
-import onmt.io
+from onmt.utils.logging import init_logger
+from onmt.translate.translator import build_translator
+
+import onmt.inputters
 import onmt.translate
 import onmt
-import onmt.ModelConstructor
+import onmt.model_builder
 import onmt.modules
 import onmt.opts
 
@@ -34,7 +40,7 @@ def nonblocking_batches(f=sys.stdin,timeout=0.2,batch_lines=5000):
                 yield "".join(line_buffer)
                 line_buffer=[]
             continue #next try
-        
+
         # f is ready to read!
         # Since we are reading conll, we should always get stuff until the next empty line, even if it means blocking read
         while True:
@@ -59,9 +65,15 @@ class Lemmatizer(object):
         # init lemmatizer model
         parser = argparse.ArgumentParser(
         description='translate.py',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,conflict_handler="resolve")
         onmt.opts.add_md_help_argument(parser)
         onmt.opts.translate_opts(parser)
+
+        # rewrite src/output arguments because we do not want these to be required anymore (default is empty, use stdin/stdout)
+        parser.add_argument("-src", default="", help="""Source sequence to decode (one line per
+                       sequence)""")
+        parser.add_argument("-output", default="", help="""Path to output the predictions (each line will
+                       be the decoded sequence""")
 
         if not args: # take arguments from sys.argv (this must be called from the main)
             self.opt = parser.parse_args()
@@ -69,13 +81,12 @@ class Lemmatizer(object):
             self.opt = parser.parse_args(args)
 
 
-        # make virtual files to collect the transformed input and output
-        self.f_input=io.StringIO() 
+        # make virtual files to collect the predicted output (not actually needed but opennmt still requires this)
         self.f_output=io.StringIO()
 
-        self.translator = make_translator(self.opt, report_score=True, out_file=self.f_output) # always output to virtual file
+        self.translator = build_translator(self.opt, report_score=True, out_file=self.f_output)
 
-        self.localcache={} #tokendata -> lemma  #remembered by this process, lost thereafter, option to dump it?
+        self.localcache={} #tokendata -> lemma  #remembered by this process, lost thereafter
 
 
     def lemmatize_batch(self, data_batch):
@@ -86,6 +97,7 @@ class Lemmatizer(object):
 
         # lemmatize data_batch
         original_sentences=[]
+        translate_input=[]
         token_counter=0
         for (comm, sent) in read_conllu(data_batch.split("\n")):
             original_sentences.append((comm, sent))
@@ -100,19 +112,15 @@ class Lemmatizer(object):
                     submitted.add(token_data)
                     submitted_tdata.append(token_data)
                     form, _ = transform_token(token)
-                    print(form, file=self.f_input)
-        self.f_input.flush()
+                    translate_input.append(form)
         print(" >>> {}/{} unique tokens submitted to lemmatizer".format(len(submitted_tdata),token_counter),file=sys.stderr)
         # run lemmatizer if everything is not in cache
         if len(submitted_tdata)>0:
-            self.f_input.seek(0) # beginning of the virtual file
-            self.translator.translate(self.opt.src_dir, self.f_input, self.opt.tgt,
-                         self.opt.batch_size, self.opt.attn_debug)
 
-            # collect lemmas from virtual output file, transform and inject to conllu
-            self.f_output.seek(0)
-            lemmatized_batch={} #token-data -> lemma
-            lemm_output=list(self.f_output.readlines())
+            scores, predictions=self.translator.translate(src_data_iter=translate_input, batch_size=len(translate_input))
+            self.f_output.truncate(0) # clear this to prevent eating memory
+
+            lemm_output=[l[0] for l in predictions]
             for tdata,predicted_lemma in zip(submitted_tdata,lemm_output):
                 predicted_lemma=detransform_string(predicted_lemma.strip())
                 self.localcache[tdata]=predicted_lemma
@@ -135,9 +143,6 @@ class Lemmatizer(object):
                 output_lines.append("\t".join(t for t in cols))
             output_lines.append("")
 
-        self.f_input=io.StringIO() # clear virtual files
-        self.f_output=io.StringIO()
-        self.translator.out_file=self.f_output
 
         return "\n".join(output_lines)+"\n"
 
@@ -149,7 +154,7 @@ def main():
     # input file
     if lemmatizer.opt.src!="":
         corpus_file = open(lemmatizer.opt.src, "rt", encoding="utf-8")
-    else: 
+    else:
         corpus_file = sys.stdin
 
     # output file
