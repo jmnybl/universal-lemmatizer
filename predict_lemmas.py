@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import argparse
+import configargparse
 
 import io
 import sys
@@ -63,16 +63,18 @@ class Lemmatizer(object):
 
     def __init__(self, args=None):
         # init lemmatizer model
-        parser = argparse.ArgumentParser(
+        parser = configargparse.ArgumentParser(
         description='translate.py',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,conflict_handler="resolve")
+        config_file_parser_class=configargparse.YAMLConfigFileParser,
+        formatter_class=configargparse.ArgumentDefaultsHelpFormatter,conflict_handler="resolve")
+        onmt.opts.config_opts(parser)
         onmt.opts.add_md_help_argument(parser)
         onmt.opts.translate_opts(parser)
 
         # rewrite src/output arguments because we do not want these to be required anymore (default is empty, use stdin/stdout)
-        parser.add_argument("-src", default="", help="""Source sequence to decode (one line per
+        parser.add_argument("--src", "-src", default="", help="""Source sequence to decode (one line per
                        sequence)""")
-        parser.add_argument("-output", default="", help="""Path to output the predictions (each line will
+        parser.add_argument("--output", "-output", default="", help="""Path to output the predictions (each line will
                        be the decoded sequence""")
 
         if not args: # take arguments from sys.argv (this must be called from the main)
@@ -117,7 +119,7 @@ class Lemmatizer(object):
         # run lemmatizer if everything is not in cache
         if len(submitted_tdata)>0:
 
-            scores, predictions=self.translator.translate(src_data_iter=translate_input, batch_size=len(translate_input))
+            scores, predictions=self.translator.translate(src_data_iter=translate_input, batch_size=self.opt.batch_size)
             self.f_output.truncate(0) # clear this to prevent eating memory
 
             lemm_output=[l[0] for l in predictions]
