@@ -86,7 +86,7 @@ class Lemmatizer(object):
         # make virtual files to collect the predicted output (not actually needed but opennmt still requires this)
         self.f_output=io.StringIO()
 
-        self.translator = build_translator(self.opt, report_score=True, out_file=self.f_output)
+        self.translator = build_translator(self.opt, report_score=False, out_file=self.f_output)
 
         self.localcache={} #tokendata -> lemma  #remembered by this process, lost thereafter
 
