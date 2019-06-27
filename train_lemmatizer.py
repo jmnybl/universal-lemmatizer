@@ -6,6 +6,8 @@ from artificial_training_data import create_data as create_art_data
 from transducer_training_data import create_data as create_trans_data
 from prepare_data import create_data as create_treebank_data
 import glob
+import re
+import math
 
 thisdir=os.path.dirname(os.path.realpath(__file__))
 
@@ -42,6 +44,7 @@ def create_training_data(config):
             print(input_, file=input_file)
             print(output_, file=output_file)
     print("Total of {x} examples in the training data.".format(x=len(data)), file=sys.stderr)
+    return len(data)
     # ready
 
 
@@ -49,7 +52,7 @@ def train(config, args):
 
     # overall steps: create training data, create devel data, preprocess data, train model, test on devel, test on test
 
-    create_training_data(config)
+    num_train_examples = create_training_data(config)
 
     # devel data
     print("Creating development data...", file=sys.stderr)
@@ -68,8 +71,30 @@ def train(config, args):
     print("Preprocessing data...", file=sys.stderr)
     os.system("python3 {workdir}/OpenNMT-py/preprocess.py -train_src {train_input} -train_tgt {train_output} -valid_src {dev_input} -valid_tgt {dev_output} -save_data {model} {params}".format(workdir=thisdir, train_input=os.path.join(model_dir,"train.input"), train_output=os.path.join(model_dir,"train.output"), dev_input=os.path.join(model_dir,"dev.input"), dev_output=os.path.join(model_dir,"dev.output"), model=os.path.join(model_dir,"model"), params=config["preprocess_parameters"]))
     
+
+    # define how many steps you need to train to get the correct number of epochs
+    if "epochs" in config:
+        batch_size = 64
+        if "-batch_size" in config["train_parameters"]:
+            batch_size = int(re.findall("-batch_size ([0-9]+)", config["train_parameters"])[0])
+        steps_per_epoch = int(math.ceil(int(num_train_examples) / batch_size))
+        total_train_steps = steps_per_epoch * int(config["epochs"])
+        start_decay = int(math.ceil(total_train_steps / 2)) # halfway
+        params = []
+        for param in re.findall("(--?[A-Za-z_]+(?: [A-Za-z0-9_\.]+)?)", config["train_parameters"]):
+            if "train_steps" in param or "valid_steps" in param or "save_checkpoint_steps" in param or "start_decay_steps" in param or "decay_steps" in param:
+                continue
+            params.append(param)
+        params.append("-train_steps {x}".format(x=total_train_steps))
+        params.append("-valid_steps {x}".format(x=steps_per_epoch))
+        params.append("-save_checkpoint_steps {x}".format(x=steps_per_epoch))
+        params.append("-start_decay_steps {x}".format(x=start_decay))
+        params.append("-decay_steps {x}".format(x=steps_per_epoch))
+        config["train_parameters"] = " ".join(params)
+
     # train
     print("Training model...", file=sys.stderr)
+    print("Parameters:",  config["train_parameters"], file=sys.stderr)
     os.system("python3 {workdir}/OpenNMT-py/train.py -data {model} -save_model {model} {params}".format(workdir=thisdir, model=os.path.join(model_dir,"model"), params=config["train_parameters"]))
 
     print("Done. Models saved in {x}.".format(x=model_dir), file=sys.stderr)
