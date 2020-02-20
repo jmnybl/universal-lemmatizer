@@ -85,7 +85,7 @@ def create_data(input_file, extra_tag=""):
 
 def main(args):
 
-    data=create_data(args.file, extra_tag=args.axtra_tag)
+    data=create_data(args.file, extra_tag=args.extra_tag)
 
     if not os.path.exists(os.path.dirname(args.output)):
         os.makedirs(os.path.dirname(args.output))

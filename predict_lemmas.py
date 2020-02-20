@@ -8,9 +8,12 @@ import io
 import sys
 import os
 import select
+import importlib
 
-
-from prepare_data import read_conllu, transform_token, detransform_token, detransform_string, ID, FORM, LEMMA, UPOS, XPOS, FEAT
+try:
+    from tnparser.universal_lemmatizer.prepare_data import read_conllu, transform_token, detransform_token, detransform_string, ID, FORM, LEMMA, UPOS, XPOS, FEAT
+except:
+    from prepare_data import read_conllu, transform_token, detransform_token, detransform_string, ID, FORM, LEMMA, UPOS, XPOS, FEAT
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "OpenNMT-py"))
 
