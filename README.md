@@ -12,4 +12,4 @@ See Turku-neural-parser-pipeline documentation at https://turkunlp.github.io/Tur
 
 ## Training new models
 
-TODO
+See documentation at https://turkunlp.org/Turku-neural-parser-pipeline/training.
