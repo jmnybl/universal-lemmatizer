@@ -112,11 +112,11 @@ class Lemmatizer(object):
                 token_counter+=1
                 if token[LEMMA]!="_": # already filled in for example by another module, do not process
                     continue
-                token_data=(token[FORM],token[UPOS],token[XPOS],token[FEAT])
+                token_data=(token[FORM],token[UPOS],token[FEAT])
                 if token_data not in self.localcache and token_data not in submitted:
                     submitted.add(token_data)
                     submitted_tdata.append(token_data)
-                    form, _ = transform_token(token)
+                    form, _ = transform_token(token, xpos=False)
                     translate_input.append(form)
         print(" >>> {}/{} unique tokens submitted to lemmatizer".format(len(submitted_tdata),token_counter),file=sys.stderr)
         # run lemmatizer if everything is not in cache
@@ -137,7 +137,7 @@ class Lemmatizer(object):
                 if "-" in cols[ID] or cols[LEMMA]!="_": # multiword token line or lemma already predicted, not supposed to be analysed
                     output_lines.append("\t".join(t for t in cols))
                     continue
-                token_data=(cols[FORM],cols[UPOS],cols[XPOS],cols[FEAT])
+                token_data=(cols[FORM],cols[UPOS],cols[FEAT])
                 if token_data in self.localcache:
                     plemma=self.localcache[token_data]
                 else:
